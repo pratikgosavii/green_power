@@ -1,0 +1,213 @@
+{% extends 'base/base.html' %}
+
+{% block head %}
+
+<style>
+
+    fieldset {
+        border: 1px solid #000;
+        margin: 40px;
+        padding: 20px;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block title %}Create Product{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+             {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">Create</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">View Inward</strong>
+            </div>
+            <div class="card-body">
+                <!-- Credit Card -->
+                <div id="pay-invoice">
+                    <div class="card-body">
+                        <div class="content" id="message_div" style="display:none;">
+                            <!-- Animated -->
+                            <div class="animated fadeIn">
+                                <div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">
+                               
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                        </div>
+                        
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Variant</label>
+                                {{ form.variant }}
+                                <small class="text-danger"> {{ form.bike.errors.as_text }} </small>
+
+                            </div>
+                            
+                           
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Date</label>
+                                <input type="text" class="form-control" value="{{ instance.date }}">
+                                <small class="text-danger"> {{ form.date.errors.as_text }} </small>
+
+                            </div>
+                            <label for="name" class="control-label mb-1">Bike Qty</label>
+
+                            <div class="form-group" style="display:flex;">
+                                <input type="number" name="bike_qty" value="{{ form.bike_qty.value  }}" class="form-control modified" id="bike_qty" required="" readonly>
+                            </div> 
+
+                            <div id="dyanamic" name="dyanamic">
+
+                                {% for i in data %}
+                                
+                                    <fieldset>
+                                        <legend style="font-size: 15px;width: 14%;max-width: 100%;padding: 12px;"> Bike {{ forloop.counter }}</legend>
+                                        
+                                        <div class="form-group">
+                                            <label for="name" class="control-label mb-1">Chasis Number</label>
+                                            <input type="text" value="{{ i.chasis_no }}" name="chasis_no" class="form-control" id="company" maxlength="120" required="" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="name" class="control-label mb-1">Motor Number</label>
+                                            <input type="text" value="{{ i.motor_no }}" name="motor_no" class="form-control" id="company" maxlength="120" required="" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="name" class="control-label mb-1">Controller Number</label>
+                                            <input type="text" value="{{ i.controller_no }}" name="controller_no" class="form-control" id="company" maxlength="120" required="" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="name" class="control-label mb-1">Color</label>
+                                            <input type="text" value="{{ i.color }}" name="controller_no" class="form-control" id="company" maxlength="120" required="" readonly>
+                                        </div>
+
+                                    </fieldset>
+
+                                {% endfor %}
+                            </div>
+
+                            
+
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- .card -->
+
+    </div><!--/.col-->
+</div>
+
+{% block js %}
+    
+
+<script>
+    
+   
+
+    const chasisNo = document.querySelector('#chasis_no1');
+    const chips = document.querySelector(".chips");
+  
+    const chasisNoList = new Set();
+  
+    
+    function render_chips(arr){
+  
+      let ll = [...arr].map(d => {
+        return `<div class="btn btn-primary mx-2">
+         ${ d } <span data-id="${d}" class="badge badge-light ml-2" id="d" >x</span>
+        </div>`
+       }).join('')
+  
+      chips.innerHTML = ll;
+      document.getElementById('d').addEventListener('click', function(e){ 
+        chasisNoList.delete(e.target.dataset.id)
+         render_chips(chasisNoList)
+      })
+    }
+  
+  
+  
+
+    function dynamic_textbox() {
+
+        if(chasisNoList.has(chasisNo.value)) {
+          alert("already present")
+        } 
+        
+        if(!chasisNoList.has(chasisNo) && chasisNo.value != '') {
+          chasisNoList.add(chasisNo.value);
+          chasisNo.value = '';
+          console.log(chasisNoList)
+    
+          render_chips(chasisNoList)
+        }
+    
+    
+    
+    
+    
+      
+        
+    
+        document.getElementById("bike").value = "";
+        document.getElementById("motor_no").value = "";
+    
+    
+        {% comment %} var myHtml =
+          '<div class="form-group" style="display:flex;"> <label class="control-label mb-1" style="margin-right: 16px;">' +
+          text_box_count +
+          '</label> <input type="text" id="chasis_no' +
+          text_box_count +
+          '" name="chasis_no" class="form-control modified" maxlength="120" required=""> </div>';
+        id_readonly = "chasis_no" + (text_box_count - 1);
+        document.getElementById(id_readonly).readOnly = true;
+        text_box_count = text_box_count + 1;
+        $("#chassis_no_div").append(myHtml); {% endcomment %}
+      }
+
+    
+    $("#distributor").change(function () {
+        document.getElementById('dealer').value = '';
+    });
+ 
+    $("#dealer").change(function () {
+        document.getElementById('distributor').value = '';
+    });
+
+    console.log("{{ instance.date }}")
+
+    document.getElementById("date1").value = "{{ instance.date }}";
+
+</script>
+{% endblock js %}
+
+{% endblock content %}

@@ -1,0 +1,180 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Product List{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+            {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">List</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+<div style="justify-content: center;display: flex;align-items: center;">
+   <a href="{% url 'add_outward' %}" > <button id="payment-button" style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="button" class="btn-info ">
+         <span id="payment-button-amount">Add Outward  +</span>
+     </button>  </a>
+   
+</div><br>
+{% comment %} 
+
+<p>
+    
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+      Outward Report
+    </button>
+  </p>
+  <div class="collapse" id="collapseExample">
+    <div class="card card-body">
+      
+
+        <form method="get" action="{% url 'report_outward' %}" style="padding:15px;">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label for="name" class="control-label mb-1">Company Name</label>
+                        {{ filter_outward.form.company }}
+                    </div>
+                    
+                    <label for="inputStatus">Name of Party</label>
+                    <select id="agent" class="form-control-sm custom-select" name="agent">
+    
+                   
+    
+                    </select>
+                    <label for="inputStatus">Crop</label>
+                    <select id="company_goods" class="form-control-sm custom-select" name="company_goods">
+    
+                   
+    
+                    </select>
+    
+                    <label for="inputStatus">Variety</label>
+                        <select id="goods_company" class="form-control-sm custom-select" name="goods_company">
+        
+                    
+        
+                    </select>
+                    <div class="form-group">
+                        <label for="name" class="control-label mb-1">Total Packet</label>
+                        {{ filter_outward.form.DC_date_start__date }}
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="name" class="control-label mb-1">Total Packet</label>
+                        {{ filter_outward.form.DC_date_end__date }}
+                    </div>
+    
+                </div> <br>
+            </div>
+            <button class="btn btn-primary" type="submit" > Search </button>
+
+        </form>
+    </div>
+  </div> {% endcomment %}
+  
+  <a href="{% url 'detail_list_outward' %}"> <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Detail View
+  </button> </a> <br> <br>
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+
+            {% if msg %}
+            <div class="content" id="message_div" style="display: contents;">
+                <!-- Animated -->
+                <div class="animated fadeIn" id="message">
+                   
+                    
+                <div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">{{ msg }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span></button></div></div>
+            </div>
+            {% endif %}
+
+            
+            <div class="card-body">
+                <h4 class="box-title">List Outward</h4>
+            </div>
+            <div class="card-body--">
+                <div class="table-stats order-table ov-h">
+                    <table class="table ">
+                        <thead>
+                            <tr>
+                                <th class="serial">#</th>
+                                <th>Showroom</th>
+                                <th>Distributor</th>
+                                <th>Date</th>
+                                <th>Bike Quantity</th>
+                                <th>Actions</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if data %}
+                            {% for i in data %}
+                            <tr>
+                                <td class="serial">{{ forloop.counter }}</td>
+                                <td>{{ i.showroom }}</td>
+                                <td>{{ i.distributor }}</td>
+                                <td>{{ i.date }}</td>
+                                <td>{{ i.bike_qty }}</td>
+                                
+                                <td>  
+
+                                    <a href="{% url 'bill_generate_outward' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                        <span id="payment-button-amount">Bill</span>
+                                    </button>  </a>
+
+                                   <a href="{% url 'update_outward' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                        <span id="payment-button-amount">View</span>
+                                    </button>  </a>
+
+                                    <a href="{% url 'delete_outward' i.id %}"> <button id="payment-button"  style="border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-danger ">
+                                        <span id="payment-button-amount">Delete</span>
+                                    </button>  </a>
+
+                                </td>
+                               
+                               
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                                <tr><td>No Product Data</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div> <!-- /.table-stats -->
+            </div>
+        </div> <!-- /.card -->
+    </div>  <!-- /.col-lg-8 -->
+
+    
+</div>
+
+
+<script>
+    
+    
+</script>
+
+
+{% endblock content %}

@@ -1,0 +1,333 @@
+{% extends 'base/base.html' %}
+
+
+{% block head %}
+
+<style>
+
+    fieldset {
+        border: 1px solid #000;
+        margin: 40px;
+        padding: 20px;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block title %}Add Outward{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+            <div class="col-sm-4">
+                <div class="page-header float-left">
+                    <div class="page-title">
+                        <h1>Add Outward</h1>
+                    </div>
+                </div>
+            </div>
+             {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">Create</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">Add Outward</strong>
+            </div>
+            <div class="card-body">
+                <!-- Credit Card -->
+                <div id="pay-invoice">
+                    <div class="card-body">
+
+                        <div class="content" id="message_div" style="display: none;">
+                            <!-- Animated -->
+                            <div class="animated fadeIn" id="message">
+                               
+                                
+                            </div>
+                        </div>
+
+                        <form id="outward_form">
+                            {% csrf_token %}
+
+                                                        
+                            <a href="{% url 'add_customer' %}"> <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                Add Customer
+                                </button> </a> <br> <br>
+        
+
+                            <div id="chassis_no_div">
+
+                                <label for="name" class="control-label mb-1">Chasis No</label> <br><br>
+                                <div class="form-group" style="display:flex;">
+                                <label class="control-label mb-1" style="margin-right: 16px;">1</label>
+
+                                <input
+                                type="text"
+                                id="chasis_no1"
+                                name="chasis_no"
+                                class="form-control modified"
+                                maxlength="120"
+                                required
+                              />
+                              <button class="btn btn-info" style="margin-left:10px;" type="button" onclick="ajax_submit()" >submit </button>
+                                
+                                </div>
+
+                                <div class="chips"></div>
+                            
+                            </div>
+
+                            <div style="border: 1px solid grey;padding: 25px;margin-top: 36px;">
+
+                                <div class="form-group">
+                                    <label for="name" class="control-label mb-1">Variant</label>
+                                    <input type="text" name="company" class="form-control" id="variant" maxlength="120" required="" readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="name" class="control-label mb-1">Motor No</label>
+                                    <input type="text" name="variant" class="form-control" id="motor_no" maxlength="120" required="" readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="name" class="control-label mb-1">Controller No</label>
+                                    <input type="text" name="color" class="form-control" id="controller_no" maxlength="120" required="" readonly>
+                                </div>
+
+                            </div>
+
+                            <br>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Customer</label>
+                                {{ form.customer }}
+                                <small class="text-danger"> {{ form.customer.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Battery Type</label>
+                                {{ form.battery_type }}
+                                <small class="text-danger"> {{ form.battery_no.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Battery No</label>
+                                {{ form.battery_no }}
+                                <small class="text-danger"> {{ form.battery_no.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Customer Service No</label>
+                                {{ form.customer_service_no }}
+                                <small class="text-danger"> {{ form.customer_service_no.errors.as_text }} </small>
+
+                            </div>
+
+                            <div>
+                                <button
+                                  id="payment-button"
+                                  type="submit"
+                                  class="btn btn-lg btn-info btn-block"
+                                >
+                                  <span id="payment-button-amount">Create Product</span>
+                                </button>
+                              </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- .card -->
+
+    </div><!--/.col-->
+</div>
+
+{% endblock content %}
+
+
+{% block js %}
+
+<script>
+
+     
+
+    var text_box_count = 2
+
+ 
+ 
+    function dynamic_textbox() {
+
+        if(chasisNoList.has(chasisNo.value)) {
+          alert("already present")
+        } 
+        
+        if(!chasisNoList.has(chasisNo) && chasisNo.value != '') {
+          chasisNoList.add(chasisNo.value);
+          chasisNo.value = '';
+          console.log(chasisNoList)
+    
+          render_chips(chasisNoList)
+        }
+        
+    
+        document.getElementById("variant").value = "";
+        document.getElementById("motor_no").value = "";
+        document.getElementById("controller_no").value = "";
+    
+    
+       }
+
+
+function ajax_submit(){
+
+    chasis_no = document.getElementById('chasis_no1').value;
+
+
+    $.ajax({   
+        cache: false,                    // initialize an AJAX request
+        type: "POST",
+        url: "{% url 'get_showroom_outward_data' %}",
+        data: {
+            'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+            'chasis_no': chasis_no,       // add the country id to the POST parameters
+        },
+
+        success: function (data) {   // `data` is from `get_topics_ajax` view function
+            //window.location.href = http + "{% url 'list_inward' %}"
+
+            if(data.objectt){
+                var a = JSON.parse(data.objectt)
+                console.log(a[0].fields)
+                document.getElementById("variant").value = a[0].fields.inward;
+                document.getElementById("motor_no").value = a[0].fields.motor_no;
+                document.getElementById("controller_no").value = a[0].fields.controller_no;
+
+            }
+
+            else{
+               alert('Chasis No not found in Inward')
+               document.body.scrollTop = document.documentElement.scrollTop = 0;
+                $("#message_div").css("display", "contents");
+                var div = document.getElementById("message");
+                div.innerHTML +=
+                  `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +
+                  'Chasis No not found in Inward' +
+                  `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+              
+            }
+        }
+    });
+    
+}
+
+
+document
+.getElementById("outward_form")
+.addEventListener("submit", function (e) {
+  e.preventDefault();
+
+
+    chasis_no = document.getElementById("chasis_no1").value;
+    
+    customer = document.getElementById("customer").value;
+    battery_no = document.getElementById("battery_no").value;
+    battery_type = document.getElementById("battery_type").value;
+    customer_service_no = document.getElementById("customer_service_no").value;
+
+    
+
+    $.ajax({   
+        cache: false,                    // initialize an AJAX request
+        type: "POST",
+        url: "{% url 'showroom_add_outward' %}",
+        data: {
+            'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+            'chasis_no':  chasis_no,
+            'customer' : customer,
+            'battery_no' : battery_no,
+            'battery_type' : battery_type,
+            'customer_service_no' : customer_service_no,
+        },
+
+        success: function (data) {   // `data` is from `get_topics_ajax` view function
+            //window.location.href = http + "{% url 'list_inward' %}"
+            
+            if (data.status == 'done'){
+                window.location.href = "{% url 'showroom_list_outward' %}";
+            }
+
+            else if (data.error !== undefined){
+                alert('here')
+                var a = JSON.parse(data.error)
+
+                console.log(a)
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+                $("#message_div").css("display","contents");
+                var div = document.getElementById('message');
+                for (var name in a) {
+                    for (var i in a[name]) {
+                        console.log(name) 
+                        div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> <strong>` + name + ` ` + `</strong>` + a[name][i].message + `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+                        console.log(a[name][i].message) 
+                    }
+                }
+
+            }
+
+            else if(data.other_error != null){
+                alert("in else");
+                alert(data.other_error);
+                console.log(data.other_error);
+                console.log(data);
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+                $("#message_div").css("display", "contents");
+                var div = document.getElementById("message");
+                div.innerHTML +=
+                  `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +
+                  data.other_error +
+                  `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+              }
+      
+              else{
+                alert("in else last");
+                alert(data.status);
+                console.log(data);
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+                $("#message_div").css("display", "contents");
+                var div = document.getElementById("message");
+                div.innerHTML +=
+                  `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +
+                  data.status +
+                  `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+              }
+            },
+          });
+
+
+        });
+
+</script>
+{% endblock js %}

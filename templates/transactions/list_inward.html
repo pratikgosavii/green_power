@@ -1,0 +1,107 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Product List{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+<div style="justify-content: center;display: flex;align-items: center;">
+   <a href="{% url 'add_inward' %}"> <button id="payment-button" style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="button" class="btn-info ">
+         <span id="payment-button-amount">Add Inward  +</span>
+     </button> </a>
+   
+</div><br>
+
+    <a href="{% url 'detail_list_inward' %}"> <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Detail View
+  </button> </a> <br> <br>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            {% if msg %}
+            <div class="content" id="message_div" style="display: contents;">
+                <!-- Animated -->
+                <div class="animated fadeIn" id="message">
+                   
+                    
+                <div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">{{ msg }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span></button></div></div>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h4 class="box-title">List Inward </h4>
+            </div>
+            <div class="card-body--">
+                <div class="table-stats order-table ov-h">
+                    <table class="table ">
+                        <thead>
+                            <tr>
+                                <th class="serial">#</th>
+                                <th>Variant</th>
+                                <th>Bike Qty</th>
+                               
+                                
+                                <th>Date</th>
+                                <th>Actions</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if data %}
+                            {% for i in data %}
+                            <tr>
+                                <td class="serial">{{ forloop.counter }}</td>
+                               
+                                <td>{{ i.variant }}</td>
+                                <td>{{ i.bike_qty }}</td>
+                               
+                                <td>{{ i.date }}</td>
+                                
+                                <td>  
+                                   <a href="{% url 'update_inward' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                        <span id="payment-button-amount">View</span>
+                                    </button>  </a>
+                                    
+                                    <a href="{% url 'delete_inward' i.id %}"> <button id="payment-button"  style="border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-danger ">
+                                        <span id="payment-button-amount">Delete</span>
+                                    </button>  </a>
+
+                                </td>
+                               
+                               
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                                <tr><td>No Product Data</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div> <!-- /.table-stats -->
+            </div>
+        </div> <!-- /.card -->
+    </div>  <!-- /.col-lg-8 -->
+
+    
+</div>
+
+
+
+<script>
+    
+   
+
+    
+</script>
+
+
+
+{% endblock content %}

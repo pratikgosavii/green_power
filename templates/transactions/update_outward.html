@@ -1,0 +1,169 @@
+{% extends 'base/base.html' %}
+
+{% block head %}
+
+<style>
+
+    fieldset {
+        border: 1px solid #000;
+        margin: 40px;
+        padding: 20px;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block title %}Create Product{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+             {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">Create</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">View OUtward</strong>
+            </div>
+            <div class="card-body">
+                <!-- Credit Card -->
+                <div id="pay-invoice">
+                    <div class="card-body">
+
+                        <div class="content" id="message_div" style="display:none;">
+                            <!-- Animated -->
+                            <div class="animated fadeIn">
+                                <div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">
+                               
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                        </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Showroom</label>
+                                
+                                <select name="showroom" class="form-control" id="showroom">
+                                
+                                <option value="" selected="">---------</option>
+                        
+                                {% for i in showroom_data %}
+        
+                                  <option value="{{i.id}}">{{ i.name }}</option>
+                              
+                                {% endfor %}
+                              
+                            </select>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" id="showroom" class="control-label mb-1">Distributor</label>
+                                {{ form.distributor }}
+                                <small class="text-danger"> {{ form.distributor.errors.as_text }} </small>
+                                
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Bike Quantiy</label>
+                                {{ form.bike_qty }}
+                                <small class="text-danger"> {{ form.bike_qty.errors.as_text }} </small>
+
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Date</label>
+                                <input type="text" class="form-control" value="{{ instance.date }}">
+
+                                <small class="text-danger"> {{ form.date.errors.as_text }} </small>
+
+                            </div>
+                            
+                            <div id="dyanamic" name="dyanamic">
+
+                                {% for i in data %}
+                                
+                                    <fieldset>
+                                        <legend style="font-size: 15px;width: 14%;max-width: 100%;padding: 12px;"> Bike {{ forloop.counter }}</legend>
+                                        
+                                        <div class="form-group">
+                                            <label for="name" class="control-label mb-1">Chasis Number</label>
+                                            <input type="text" value="{{ i.bike_number.chasis_no }}" name="chasis_no" class="form-control" id="company" maxlength="120" required="" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="name" class="control-label mb-1">Motor Number</label>
+                                            <input type="text" value="{{ i.bike_number.motor_no }}" name="motor_no" class="form-control" id="company" maxlength="120" required="" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="name" class="control-label mb-1">Controller Number</label>
+                                            <input type="text" value="{{ i.bike_number.controller_no }}" name="controller_no" class="form-control" id="company" maxlength="120" required="" readonly>
+                                        </div>
+                                    </fieldset>
+
+                                {% endfor %}
+                            </div>
+
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- .card -->
+
+    </div><!--/.col-->
+</div>
+
+
+{% endblock content %}
+
+
+{% block js %}
+
+<script>
+    
+    $("#distributor").change(function () {
+        document.getElementById('showroom').value = '';
+    });
+ 
+    $("#showroom").change(function () {
+        document.getElementById('distributor').value = '';
+    });
+
+    window.addEventListener('load', function () {
+        alert({{ showroom_id }})
+        document.getElementById("showroom").value = {{ showroom_id }};
+
+      })
+
+
+
+</script>
+ 
+{% endblock js %}

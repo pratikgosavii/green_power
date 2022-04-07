@@ -1,0 +1,116 @@
+{% extends 'base/base.html' %}
+
+
+
+{% block title %}Add Distributor{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+             {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">Create</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">Add Distributor</strong>
+            </div>
+            <div class="card-body">
+                <!-- Credit Card -->
+                <div id="pay-invoice">
+                    <div class="card-body">
+                        <form action="#" method="post" >
+                            {% csrf_token %}
+
+                            
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Status</label>
+                                {{ form.status }}
+                                <small class="text-danger"> {{ form.status.errors.as_text }} </small>
+
+                            </div>
+                           
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Name</label>
+                                {{ form.name }}
+                                <small class="text-danger"> {{ form.name.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">GSTIN No</label>
+                                {{ form.GSTIN_no }}
+                                <small class="text-danger"> {{ form.GSTIN_no.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Address</label>
+                                {{ form.address }}
+                                <small class="text-danger"> {{ form.address.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Place</label>
+                                {{ form.place }}
+                                <small class="text-danger"> {{ form.place.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Taluka</label>
+                                {{ form.taluka }}
+                                <small class="text-danger"> {{ form.taluka.errors.as_text }} </small>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">District</label>
+                                {{ form.district }}
+                                <small class="text-danger"> {{ form.district.errors.as_text }} </small>
+                                
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Mobile Number</label>
+                                {{ form.mobile_number }}
+                                <small class="text-danger"> {{ form.mobile_number.errors.as_text }} </small>
+                                
+                            </div>
+
+                            <div>
+                                <button id="payment-button" type="submit" class="btn btn-lg btn-info btn-block">
+                                    <span id="payment-button-amount">Create Product</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- .card -->
+
+    </div><!--/.col-->
+</div>
+{% endblock content %}

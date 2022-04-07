@@ -1,0 +1,302 @@
+{% extends 'base/base.html' %}
+
+{% block head %}
+
+<style>
+
+    fieldset {
+        border: 1px solid #000;
+        margin: 40px;
+        padding: 20px;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block title %}Create Product{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">Add Inward</strong>
+            </div>
+            <div class="card-body">
+                <!-- Credit Card -->
+                <div id="pay-invoice">
+                    <div class="card-body">
+
+                        <div class="content" id="message_div" style="display: none;">
+                            <!-- Animated -->
+                            <div class="animated fadeIn" id="message">
+                               
+                                
+                            </div>
+                        </div>
+
+                        <form id ="inward_form">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Variant</label>
+                                {{ form.variant }}
+                                <small class="text-danger"> {{ form.bike.errors.as_text }} </small>
+
+                            </div>
+                            
+                            <label for="name" class="control-label mb-1">Bike Qty</label>
+
+                            <div class="form-group" style="display:flex;">
+                                {{ form.bike_qty }}
+                                <small class="text-danger"> {{ form.bike_qty.errors.as_text }} </small>
+
+                                <button class="btn btn-info" style="margin-left:10px;" type="button" onclick="dynamic_textbox()" >submit </button>
+                            </div> 
+
+                            <div id="dyanamic" name="dyanamic">
+                                
+                            </div>
+
+
+
+                            <div style="justify-content: center;display: none;align-items: center;" id="single">
+                                 <button onclick="single_dynamic_textbox()" id="payment-button" style="background-color: #007bff; border-color: #007bff; padding: 10px;border-radius: 12px;color: white;" type="button" class="btn ">
+                                      <span id="payment-button-amount">Add More  +</span>
+                                  </button>
+                                
+                             </div><br>
+                            
+
+
+
+
+
+                            <div>
+                                <button
+                                  id="payment-button"
+                                  type="submit"
+                                  class="btn btn-lg btn-info btn-block"
+                                >
+                                  <span id="payment-button-amount">Create Product</span>
+                                </button>
+                              </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- .card -->
+
+    </div><!--/.col-->
+</div>
+
+{% endblock content %}
+
+{% block js %}
+
+
+<script>
+
+    let g_count = 1
+
+    function single_dynamic_textbox(){
+
+        let z = ''
+
+        {% for i in color_data %}
+
+            z = z + '<option value= "{{ i.id }}"> {{ i.name }} </option>'
+
+        {% endfor %}
+
+        var myHtml =   '<fieldset> <legend style="font-size: 15px;width: 14%;max-width: 100%;padding: 12px;"> Bike ' + g_count + '</legend>' 
+            + '<div class="form-group"> <label for="name" class="control-label mb-1">Chasis Number</label> <input type="text" name="chasis_no" class="form-control" id="company" maxlength="120" required=""> </div>'
+            + '<div class="form-group"> <label for="name" class="control-label mb-1">Motor Number</label> <input type="text" name="motor_no" class="form-control" id="company" maxlength="120" required=""> </div>'
+            + '<div class="form-group"> <label for="name" class="control-label mb-1">Controller Number</label> <input type="text" name="controller_no" class="form-control" id="company" maxlength="120" required=""> </div>'
+            
+            + `<label for="name" class="control-label mb-1">Color</label>` 
+            + `<select name="color" class="form-control" id="color" required=""> <option value="" selected="">---------</option>`
+              
+            + z
+              
+               
+            + `</select>`
+            + `<small class="text-danger">  </small>`
+            
+            + ' </fieldset>';
+
+
+            $('#dyanamic').append(myHtml);
+
+            document.getElementById("bike_qty").value = g_count;
+
+            g_count = g_count + 1
+
+
+    }
+
+    function dynamic_textbox(){
+
+        g_count = 1
+
+
+        $('#dyanamic').empty()
+
+        let z = ''
+
+        {% for i in color_data %}
+
+            z = z + '<option value= "{{ i.id }}"> {{ i.name }} </option>'
+
+        {% endfor %}
+
+       
+        bike_qty = document.getElementById("bike_qty").value;
+        
+        for (i = 1; i <= bike_qty; i++) {
+            var myHtml =   '<fieldset> <legend style="font-size: 15px;width: 14%;max-width: 100%;padding: 12px;"> Bike ' + g_count + '</legend>' 
+            + '<div class="form-group"> <label for="name" class="control-label mb-1">Chasis Number</label> <input type="text" name="chasis_no" class="form-control" id="company" maxlength="120" required=""> </div>'
+            + '<div class="form-group"> <label for="name" class="control-label mb-1">Motor Number</label> <input type="text" name="motor_no" class="form-control" id="company" maxlength="120" required=""> </div>'
+            + '<div class="form-group"> <label for="name" class="control-label mb-1">Controller Number</label> <input type="text" name="controller_no" class="form-control" id="company" maxlength="120" required=""> </div>'
+            
+            + `<label for="name" class="control-label mb-1">Color</label>` 
+            + `<select name="color" class="form-control" id="color" required=""> <option value="" selected="">---------</option>`
+              
+            + z
+              
+               
+            + `</select>`
+            + `<small class="text-danger">  </small>`
+            
+            + ' </fieldset>';
+
+
+            $('#dyanamic').append(myHtml);
+            $('#single').css("display", "flex")
+
+            g_count = g_count + 1
+        }
+    }
+
+    
+
+    document
+    .getElementById("inward_form")
+    .addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        
+        variant = document.getElementById("variant").value;
+        
+
+        chasis_no = document.getElementsByName("chasis_no");
+        motor_no = document.getElementsByName("motor_no");
+        controller_no = document.getElementsByName("controller_no");
+        color = document.getElementsByName("color");
+    
+
+        chasis_no_arr = []
+        motor_no_arr = []
+        controller_no_arr = []
+        color_arr = []
+        
+        for (i = 0; i < chasis_no.length; i++) {
+
+            if (chasis_no_arr.includes(chasis_no[i].value)){
+                return false;
+            } 
+            if (motor_no_arr.includes(motor_no[i].value)){
+                return false;
+            } 
+            if (controller_no_arr.includes(controller_no[i].value)){
+                return false;
+            } 
+            chasis_no_arr.push(chasis_no[i].value);
+            motor_no_arr.push(motor_no[i].value);
+            controller_no_arr.push(controller_no[i].value);
+            color_arr.push(color[i].value);
+
+        }
+
+        let form_data = {
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            chasis_no: chasis_no_arr,
+            motor_no: motor_no_arr,
+            controller_no: controller_no_arr,
+            color: color_arr,
+            variant : variant,
+            bike_qty : bike_qty,
+          }
+
+  
+  
+        submit_form(form_data);
+
+    });
+
+    function submit_form(form_data) {
+
+
+        $.ajax({   
+            cache: false,                    // initialize an AJAX request
+            type: "POST",
+            url: "{% url 'add_inward' %}",
+            data: form_data,     // add the country id to the POST parameters
+
+            success: function (data) {   // `data` is from `get_topics_ajax` view function
+                //window.location.href = http + "{% url 'list_inward' %}"
+
+                if (data.status == 'done'){
+                    window.location.href = "{% url 'list_inward' %}";
+                }
+
+                else if (data.error !== undefined){
+                    var a = JSON.parse(data.error)
+    
+                    console.log(a)
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                    $("#message_div").css("display","contents");
+                    var div = document.getElementById('message');
+                    for (var name in a) {
+                        for (var i in a[name]) {
+                            console.log(name) 
+                            div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> <strong>` + name + ` ` + `</strong>` + a[name][i].message + `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+                            console.log(a[name][i].message) 
+                        }
+                    }
+    
+                }
+
+                else{
+                    console.log('here')
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                    $("#message_div").css("display","contents");
+                    var div = document.getElementById('message');
+                    div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +  data.status + `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+    
+                }
+            }
+
+        });
+
+    }
+
+    
+
+
+</script>
+{% endblock js %}

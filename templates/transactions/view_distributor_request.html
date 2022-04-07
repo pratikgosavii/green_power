@@ -1,0 +1,96 @@
+{% extends 'base/base.html' %}
+
+
+{% block title %}Product List{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            {% if msg %}
+            <div class="content" id="message_div" style="display: contents;">
+                <!-- Animated -->
+                <div class="animated fadeIn" id="message">
+                   
+                    
+                <div class="alert alert-info alert-dismissible fade show" id="message" role="alert">{{ msg }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span></button></div></div>
+            </div>
+            {% endif %}
+            
+            <div class="card-body">
+                <h4 class="box-title">Distributor Request List </h4>
+            </div>
+            <div class="card-body--">
+                <div class="table-stats order-table ov-h">
+                    <table class="table ">
+                        <thead>
+                            <tr>
+                                <th class="serial">#</th>
+                                
+                                <th>Distributor</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if data %}
+                            {% for i, y in data %}
+                            <tr>
+                                <td class="serial">{{ forloop.counter }}</td>
+                               
+                                <td>{{ i.distributor }}</td>
+                                <td>{{ i.date }}</td>
+                               
+
+                                <td>  
+                                    <a href="{% url 'detials_distributor_request' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                         <span id="payment-button-amount">View</span>
+                                     </button>  </a>
+
+                                    <a href="{% url 'distributor_view_pr' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                         <span id="payment-button-amount">View PR</span>
+                                     </button>  </a>
+
+                                    <a href="{% url 'distributor_send_pr' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                         <span id="payment-button-amount">Send PR</span>
+                                     </button>  </a>
+
+
+                                     {% if y %}
+
+                                        <a href="{% url 'view_payment_detials' y.id %}"> <button id="payment-button"  style="background-color: #red; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                            <spasn id="payment-button-amount">View Payment Details</span>
+                                        </button>  </a>
+
+                                    {% endif %}
+
+                                   
+                                     
+                                 </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                                <tr><td>No Product Data</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div> <!-- /.table-stats -->
+            </div>
+        </div> <!-- /.card -->
+    </div>  <!-- /.col-lg-8 -->
+</div><br>
+
+    
+{% endblock content %}
