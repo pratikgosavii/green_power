@@ -36,11 +36,13 @@ class distributor_request_Form(forms.ModelForm):
     class Meta:
         model = distributor_req
         fields = '__all__'
-        exclude = ['distributor', 'date']
         widgets = {
             
             'variant': forms.Select(attrs={
                 'class': 'form-control', 'id': 'bike'
+            }),
+            'distributor_request': forms.Select(attrs={
+                'class': 'form-control', 'id': 'distributor_request'
             }),
             'color': forms.Select(attrs={
                 'class': 'form-control', 'id': 'bike'

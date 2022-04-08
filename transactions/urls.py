@@ -36,7 +36,7 @@ urlpatterns = [
     
     path('distributor-view-PR/<request_id>', distributor_view_pr, name='distributor_view_pr'),
     path('distributor-send-PR/<request_id>', distributor_send_pr, name='distributor_send_pr'),
-    path('view-apyment-detials/<payment_id>', view_payment_detials, name='view_payment_detials'),
+    path('view-payment-detials/<payment_id>', view_payment_detials, name='view_payment_detials'),
 
     
     path('bill-generate-outward/<outward_id>', bill_generate_outward, name='bill_generate_outward'),

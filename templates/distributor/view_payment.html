@@ -1,0 +1,68 @@
+{% extends 'base/base.html' %}
+
+
+
+{% block title %}Add Company{% endblock title %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+             {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">Create</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">Add payment detials</strong>
+            </div>
+            <div class="card-body">
+                <!-- Credit Card -->
+                <div id="pay-invoice">
+                    <div class="card-body">
+                        
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Payment type</label>
+                                {{ form.payment_type }}
+                                <small class="text-danger"> {{ form.name.errors.as_text }} </small>
+
+                                
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Payment Id</label>
+                                {{ form.payment_id }}
+                                <small class="text-danger"> {{ form.payment_id.errors.as_text }} </small>
+
+                                
+                            </div>
+
+                    
+                           
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- .card -->
+
+    </div><!--/.col-->
+</div>
+{% endblock content %}

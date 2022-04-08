@@ -42,14 +42,16 @@ class showroom_outward_Form(forms.ModelForm):
 
 class showroom_request_Form(forms.ModelForm):
     class Meta:
-        model = showroom_request
+        model = showroom_req
         fields = '__all__'
-        exclude = ['showroom']
         widgets = {
             
             
             'variant': forms.Select(attrs={
                 'class': 'form-control', 'id': 'bike'
+            }),
+            'showroom_request': forms.Select(attrs={
+                'class': 'form-control', 'id': 'showroom_request'
             }),
             'color': forms.Select(attrs={
                 'class': 'form-control', 'id': 'bike'
@@ -58,12 +60,32 @@ class showroom_request_Form(forms.ModelForm):
                 'class': 'form-control', 'id': 'bike_qty'
             }),
 
-            'distributor': forms.Select(attrs={
-                'class': 'form-control', 'id': 'distributor'
-            }),
-            
-
         }
+
+
+
+
+class showroom_payment_details_From(forms.ModelForm):
+    class Meta:
+        model = showroom_payment_details
+        fields = '__all__'
+        widgets = {
+            
+            'showroom_request': forms.Select(attrs={
+                'class': 'form-control', 'id': 'distributor_request'
+            }),
+            'payment_type': forms.TextInput(attrs={
+                'class': 'form-control', 'id': 'payment_type'
+            }),
+            'payment_id': forms.TextInput(attrs={
+                'class': 'form-control', 'id': 'payment_id'
+            }),
+
+            
+        }
+
+
+
 
 
 class customer_Form(forms.ModelForm):

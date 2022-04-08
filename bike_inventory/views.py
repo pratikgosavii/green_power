@@ -96,8 +96,9 @@ def dashboard(request):
         stock_count = showroom_stock.objects.filter(user = request.user)
         inward_data = showroom_inward.objects.filter(user = request.user)
         outward_data = showroom_outward.objects.filter(user = request.user)
-        distributor_data = showroom.objects.get(user = request.user)
-        request_data1 = showroom_request.objects.filter(showroom = distributor_data)
+        
+        showroom_da = showroom.objects.get(user = request.user)
+        request_data1 = showroom_request.objects.filter(showroom = showroom_da)
 
 
         for i in stock_count:
@@ -106,8 +107,12 @@ def dashboard(request):
         for i in outward_data:
             outward_.append(i.bike_qty)
 
-        for i in request_data1:
-            request_.append(i.bike_qty)
+        for y in request_data1:
+
+            z = showroom_req.objects.filter(showroom_request = y)
+
+            for i in z:
+                request_.append(i.bike_qty)
 
 
         for i in inward_data:

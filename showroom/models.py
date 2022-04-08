@@ -37,14 +37,33 @@ class showroom_inward(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
+
+
 class showroom_request(models.Model):
+
+    showroom = models.ForeignKey(showroom, on_delete=models.CASCADE, related_name='dfdscf')
+    date = models.DateTimeField(auto_now_add=True)
+    pr_pdf = models.CharField(max_length=500)
+    distributor = models.ForeignKey(distributor, on_delete=models.CASCADE, related_name='sdsdsx', blank=True, null= True,)
+
+
+class showroom_req(models.Model):
     
+    showroom_request = models.ForeignKey(showroom_request, on_delete=models.CASCADE)
     variant = models.ForeignKey(variant, on_delete=models.CASCADE, related_name='xcxcsxcs')
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='xcxcsxcs')
     bike_qty = models.IntegerField()
-    showroom = models.ForeignKey(showroom, on_delete=models.CASCADE, related_name='dfdscf')
-    date = models.DateTimeField(auto_now_add=True)
-    distributor = models.ForeignKey(distributor, on_delete=models.CASCADE, related_name='sdsdsx', blank=True, null= True,)
+
+
+
+class showroom_payment_details(models.Model):
+
+
+    showroom_request = models.ForeignKey(showroom_request, on_delete=models.CASCADE, unique = True)
+    payment_type = models.CharField(max_length=100)
+    payment_id = models.CharField(max_length=200)
+
+
 
 
 

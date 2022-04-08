@@ -46,25 +46,46 @@
                             <tr>
                                 <th class="serial">#</th>
                                 <th>Variant</th>
-                                <th>Color</th>
-                                <th>Bike Qty</th>
                                 <th>Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% if data %}
-                            {% for i in data %}
+                            {% for i,y in data %}
                             <tr>
                                 <td class="serial">{{ forloop.counter }}</td>
-                                <td>{{ i.variant }}</td>
-                                <td>{{ i.color }}</td>
-                                <td>{{ i.bike_qty }}</td>
+                                <td>{{ i.distributor }}</td>
                                 <td>{{ i.date }}</td>
                                
                                 <td>  
-                                   <a href="{% url 'showroom_update_request' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                   <a href="{% url 'distributor_details_request' i.id %}"> <button id="payment-button"  style="background-color: #40a94b; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
                                         <span id="payment-button-amount">View</span>
+                                    </button>  </a>
+                                  
+
+                                    {% if i.pr_pdf %}
+
+                                        <a href="{% url 'showroom_download' i.id %}"> <button id="payment-button"  style="background-color: #red; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                            <span id="payment-button-amount">View PR</span>
+                                        </button>  </a>
+                                        {% if y %}
+
+                                            <a href="{% url 'showroom_update_payment_detials' y.id %}"> <button id="payment-button"  style="background-color: #red; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                                <spasn id="payment-button-amount">Update Payment Details</span>
+                                            </button>  </a>
+
+                                        {% else %}
+
+                                            <a href="{% url 'showroom_send_payment_detials' i.id %}"> <button id="payment-button"  style="background-color: #red; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                                <span id="payment-button-amount">Send Payment Details</span>
+                                            </button>  </a>
+
+                                        {% endif %}
+                                    {% endif %}
+
+                                    <a href="{% url 'showroom_delete_request' i.id %}"> <button id="payment-button"  style="background-color: #red; border: #40a94b;  padding: 10px;border-radius: 12px;" type="submit" class="btn-info ">
+                                        <span id="payment-button-amount">Delete</span>
                                     </button>  </a>
                                     
                                 </td>

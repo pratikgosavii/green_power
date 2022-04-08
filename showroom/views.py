@@ -572,22 +572,34 @@ def add_request(request):
         print(variant_get)
         print(color)
 
+        showroom_data = showroom.objects.get(user = request.user)
+        distributor_data = showroom_data.Distributor
+
+        instance = showroom_request.objects.create(distributor = distributor_data, showroom = showroom_data)
+
+        print('priting instance-------------------')
+
+        print(instance)
+
+        updated_request = request.POST.copy()
+
+        print(request.POST)
+
         for a,b,c in zip(variant_get, color, bike_qty):
 
             variant_data = variant.objects.get(name = a)
             color_data = Color.objects.get(name = b)
 
-            updated_request = request.POST.copy()
-            updated_request.update({'variant': variant_data, 'color' : color_data, 'bike_qty' : c})
+            
+            updated_request.update({'variant': variant_data, 'color' : color_data, 'bike_qty' : c, 'showroom_request' : instance})
             forms = showroom_request_Form(updated_request)        
+            
+            
             if forms.is_valid():
 
-                instance = forms.save(commit=False)
-                showroom_data =showroom.objects.get(user = request.user)
-                distributor_data = showroom_data.Distributor
-                instance.showroom = showroom_data
-                instance.distributor = distributor_data
-                instance.save()
+                forms.save()
+
+                print('savng')
 
             else:
 
@@ -672,18 +684,237 @@ def update_request(request, request_id):
         return render(request, 'showroom/add_request.html', context)
 
 
+
+
+
+
+@showroom_required(login_url='login')
+def update_request(request, request_id):
+
+    instance = showroom_request.objects.get(id = request_id)
+
+    if request.method == 'POST':
+
+        DC_date = request.POST.get('date')
+
+        if DC_date:
+            
+            date_time = numOfDays(DC_date)
+        else:
+            date_time = datetime.now(IST)
+
+        updated_request = request.POST.copy()
+        updated_request.update({'date': date_time})
+        forms = showroom_request_Form(updated_request, instance = instance)
+
+        if forms.is_valid():
+
+            instance = forms.save(commit=False)
+            instance.user = request.user
+            instance.save()
+
+            print('sdsdsdssd')
+
+            return redirect('showroom_list_request')
+
+        else:
+
+            context = {
+                'form': forms,
+                
+            }
+            return render(request, 'showroom/add_request.html', context)
+
+
+    else:
+
+        forms = showroom_request_Form(instance = instance)
+
+        context = {
+            'form': forms,
+            
+        }
+        return render(request, 'showroom/add_request.html', context)
+
+
+
+
+@showroom_required(login_url='login')
+def details_request(request, request_id):
+
+    showroom_request_instance = showroom_request.objects.get(id = request_id)
+    data = showroom_req.objects.filter(showroom_request = showroom_request_instance)
+    
+    print(showroom_request_instance)
+    print(data)
+
+    context = {
+        'data': data,
+        
+    }
+    return render(request, 'showroom/details_request.html', context)
+
+
+
+
+@showroom_required(login_url='login')
+def delete_request(request, request_id):
+
+    showroom_request.objects.get(id = request_id).delete()
+    
+
+    return redirect('showroom_list_request')
+
+
 @showroom_required(login_url='login')
 def list_request(request):
 
     showroom_data = showroom.objects.get(user = request.user)
     data = showroom_request.objects.filter(showroom = showroom_data)
 
+    payment_update = []
+
+    for i in data:
+        try:
+            a = showroom_payment_details.objects.get(showroom_request = i)
+        except showroom_payment_details.DoesNotExist:
+            a = None
+        if a:
+            payment_update.append(a)
+        else:
+            payment_update.append('')
+    
+    data = zip(data, payment_update)
+    data = list(data)
 
     context = {
         'data': data,
         
     }
+
+
     return render(request, 'showroom/list_request.html', context)
+
+
+
+@showroom_required(login_url='login')
+# @showroom_required(login_url='login')
+def download_pr(request, request_id):
+
+
+    
+    path = os.path.join(BASE_DIR)
+    print(path)
+
+    instance = showroom_request.objects.get(id = request_id)
+
+    print('i am')
+
+    return FileResponse(open(instance.pr_pdf, 'rb'), content_type='application/pdf')
+
+
+
+
+
+
+@showroom_required(login_url="login")
+def showroom_send_payment_detials(request, request_id):
+
+
+    if request.method == 'POST':
+
+        instance = showroom_request.objects.get(id = request_id)
+
+        updated_request = request.POST.copy()
+        updated_request.update({'showroom_request': instance})
+        forms = showroom_payment_details_From(updated_request)
+
+        if forms.is_valid():
+            forms.save()
+
+            print('saveeeeeeeeeeee')
+
+            return redirect('showroom_list_request')
+
+        else:
+
+            print(forms.errors)
+
+            
+
+            context = {
+                'form': forms,
+                
+            }
+            
+            return render(request, 'showroom/payment_details.html', context)
+
+
+
+
+    else:
+
+        form = showroom_payment_details_From()
+
+        context = {
+            'form': form,
+            
+        }
+        
+        return render(request, 'showroom/payment_details.html', context)
+
+
+
+
+@showroom_required(login_url='login')
+def showroom_update_payment_detials(request, payment_id):
+
+    instance = distributor_payment_details.objects.get(id = payment_id)
+    data = instance.showroom_request
+
+    if request.method == 'POST':
+
+
+        updated_request = request.POST.copy()
+        updated_request.update({'showroom_request': data})
+        forms = showroom_payment_details_From(updated_request, instance = instance)
+
+        if forms.is_valid():
+            forms.save()
+
+            print('saveeeeeeeeeeee')
+
+            return redirect('showroom_list_request')
+
+        else:
+
+            print(forms.errors)
+
+            
+
+            context = {
+                'form': forms,
+                
+            }
+            
+            return render(request, 'showroom/payment_details.html', context)
+
+
+
+    else:
+
+        form = showroom_payment_details_From(instance = instance)
+
+        context = {
+            'form': form,
+            
+        }
+        
+        return render(request, 'showroom/payment_details.html', context)
+
+
+
+
 
 
 

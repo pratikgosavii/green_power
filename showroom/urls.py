@@ -33,8 +33,14 @@ urlpatterns = [
 
     path('add-request/', add_request, name='showroom_add_request'),
     path('update-request/<request_id>', update_request, name='showroom_update_request'),
-    # path('delete-request/<request_id>', delete_request, name='distributor_delete_request'),
+    path('details-request/<request_id>', details_request, name='showroom_details_request'),
+    path('delete-request/<request_id>', delete_request, name='showroom_delete_request'),
     path('list-request/', list_request, name='showroom_list_request'),
+    path('download-pr/<request_id>', download_pr, name='showroom_download'),
+    path('showroom-send-payment-detials-pr/<request_id>', showroom_send_payment_detials, name='showroom_send_payment_detials'),
+    path('showroom-update-payment-detialsr/<payment_id>', showroom_update_payment_detials, name='showroom_update_payment_detials'),
+
+
 
     path('list-stock/', list_stock, name='showroom_list_stock'),
 

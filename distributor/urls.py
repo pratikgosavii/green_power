@@ -30,14 +30,19 @@ urlpatterns = [
     path('download-pr/<request_id>', download_pr, name='distributor_download'),
     path('distributor-send-payment-detials-pr/<request_id>', distributor_send_payment_detials, name='distributor_send_payment_detials'),
     path('distributor-update-payment-detialsr/<payment_id>', distributor_update_payment_detials, name='distributor_update_payment_detials'),
-    
-    path('view-request/', view_request, name='distributor_view_request'),
 
     path('detail-list-inward/', detail_list_inward, name='distributor_detail_list_inward'),
     path('detail-list-outward/', detail_list_outward, name='distributor_detail_list_outward'),
 
     path('list-stock/', list_stock, name='distributor_list_stock'),
     
+    
+    path('view-request/', view_request, name='distributor_view_request'),
+
+    path('showroom-view-PR/<request_id>', showroom_view_pr, name='showroom_view_pr'),
+    path('showroom-send-PR/<request_id>', showroom_send_pr, name='showroom_send_pr'),
+    path('view-payment-detials/<payment_id>', view_payment_detials, name='distributor_view_payment_detials'),
+
 
     path('bill-generate-distributor-outward/<distributor_outward_id>', bill_generate_distributor_outward, name='bill_generate_distributor_outward'),
 

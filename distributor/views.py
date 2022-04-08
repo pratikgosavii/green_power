@@ -573,9 +573,6 @@ def add_request(request):
         color = request.POST.getlist("color[]")
         bike_qty = request.POST.getlist("bike_qty[]")
 
-        print(variant_get)
-        print(color)
-
         distributor_data = distributor.objects.get(user = request.user)
 
         instance = distributor_request.objects.create(distributor = distributor_data)
@@ -592,10 +589,9 @@ def add_request(request):
 
             if forms.is_valid():
 
-                instance = forms.save(commit=False)
-                distributor_data =distributor.objects.get(user = request.user)
-                instance.distributor = distributor_data
-                instance.save()
+                forms.save()
+
+                print('saveeee')
 
             else:
 
@@ -858,12 +854,26 @@ def view_request(request):
     
     data = showroom_request.objects.filter(distributor = instance)
 
-    print(data)
+    payment_update = []
+
+    for i in data:
+        try:
+            a = showroom_payment_details.objects.get(showroom_request = i)
+            print('priting a ')
+            print(a)
+        except showroom_payment_details.DoesNotExist:
+            a = None
+        if a:
+            payment_update.append(a)
+        else:
+            payment_update.append('')
+
+    data = zip(data, payment_update)
+    data = list(data)
+
     context = {
         'data': data,
-        
     }
-
     return render(request, 'distributor/view_request.html', context)
 
 
@@ -908,6 +918,485 @@ def number_to_word(number):
             arr[1]+="0"
          word+=" and "+get_all_word(int(arr[1]))+" paisa"
     return word
+
+
+
+
+
+@distributor_required(login_url="login")
+def  showroom_view_pr(request, request_id, pathneeded = None):
+
+
+    request_data = showroom_request.objects.get(id=request_id)
+    
+    
+    data = showroom_req.objects.filter(showroom_request = request_data)
+
+
+    print('data')
+    print(data)
+
+    dfsdfs = 1
+
+    if dfsdfs == 1:
+
+        print(data)
+        all_price = []
+
+    
+        
+        for i in data:
+            
+            variant1 = i.variant
+            p = prices.objects.get(variant = variant1)
+            all_price.append(p.dealer_price)
+            
+            address = request_data.showroom.address
+            taker_name = request_data.showroom.name
+            gst = request_data.showroom.GSTIN_no
+            
+       
+        print(all_price)
+       
+        date_data = request_data.date
+        str1 = address
+
+        if len(address) > 30:
+            address = [address[i:i+30] for i in range(0, len(address), 30)]
+
+            # initialize an empty string
+            str1 = "" 
+            
+            # traverse in the string  
+            for ele in address: 
+                str1 += (ele + '\n')
+        date_li = str(date_data).split(' ')
+        date_data = "Date:- " + date_li[0]
+        
+        # data which we are going to display as tables
+
+
+        
+        list_1 = []
+        list_2 = []
+        grand_total = []
+        list_1.append([ "SR NO" , "Particulars", "Rate", "Qty", "HSN/SAC", "TOTAL" ])
+
+        count = 1
+
+        for i in data:
+
+            rate = prices.objects.get(variant = i.variant)
+
+            hsc = i.variant.hsn_sac
+
+            total = int(rate.dealer_price) * int(i.bike_qty)
+            
+
+
+            list_2 = []
+
+            list_2.append(count)
+            list_2.append(i.variant)
+            list_2.append(rate.dealer_price)
+            list_2.append(i.bike_qty)
+            list_2.append(hsc)
+            list_2.append(total)
+            grand_total.append(total)
+            list_1.append(list_2)
+
+            count = count + 1
+
+        print(list_1)
+
+        grand_total = sum(grand_total)
+
+        grand_total_price = ((grand_total / 100) * 5) + grand_total
+
+        inword_price = number_to_word(grand_total_price)
+
+
+
+        DATA = list_1
+
+
+        
+        
+
+        DATA3 = [
+            [
+                "ANITA MOTORS",
+                "Invoice no:-3434",
+                date_data,
+                
+                
+            ],
+            [
+                "Rahate complex, Jawahar Nagar,",
+                "Consignee",
+                "Payment= NEFT/RTGS"
+            ],
+            [
+                "Akola 444001.Contact:- 7020753206.",
+                taker_name,
+                str1 + '\n' +  "GSTIN NO=" + gst,
+                
+            ],
+            [
+                "GSTIN NO=27CSZPR0818J1ZX",
+                "",
+                "",
+                
+            ],
+        ]
+
+        
+        DATA4 = [
+            [   "CGST 2.5%:-INC",
+                "SGST 2.5%:-INC",
+
+            
+            ],
+        ]
+
+        DATA5 = [
+            [   inword_price,
+                "",
+                "",
+                "",
+                
+
+            
+            ],
+            [
+                "CUSTOMER SIGNATURE",
+                "FOR ANITA MOTORS",
+                "TOTAL",
+                grand_total,
+            
+            ],
+            [   "",
+                "",
+                "GST 5%",
+                "INC",
+
+
+            ],
+
+            [   "",
+                "Proprietor",
+                "GRAND TOTAL",
+                grand_total_price,
+            ],
+        ]
+
+        DATA6 = [
+            [ 
+                "> Battery should not be over charged, if it is seen that the battery is bulging then the warranty will be terminated.",
+            ] ,
+
+            [
+                "> Get all the batteries balanced by rotating in every 3 months from your nearest dealer.",
+            ],
+            [  
+                "> Keep the batteries away from water. Do not wash batteries. Batteries are sealed do not attempt to add acid. ",
+            ],
+
+            [  
+                "> Do not accelerate and brake abruptly. Do not over load the scooter. Keep batteries cool. Charge under shade.",
+            ],
+
+            [  
+                "> Once a month, Dischargebattery fully and Chargebattery fully. Charge after at-least 30 minutes of a long drive.",
+            ],
+        ]
+
+
+        DATA7 = [
+            [ 
+                "> BATTERY 8+4 GAREENTY/WAREENTY.",
+            ] ,
+
+            [
+                "> CONTROLLER AND MOTOR COMPLETE 1 YEAR GAREENTY.",
+            ],
+            
+        ]
+
+
+        
+        
+        # creating a Base Document Template of page size A4
+
+        time =  str(datetime.now(ist))
+        time = time.split('.')
+        time = time[0].replace(':', '-')
+        name = "Bill " + time + ".pdf"
+        path = os.path.join(BASE_DIR) + '\media\\' + name
+        
+        pdf = SimpleDocTemplate(path , pagesize = A4 )
+        
+        # standard stylesheet defined within reportlab itself
+        styles = getSampleStyleSheet()
+        
+        # fetching the style of Top level heading (Heading1)
+        title_style = styles[ "Heading1" ]
+        
+        # 0: left, 1: center, 2: right
+        title_style.alignment = 1
+        
+        # creating the paragraph with
+        # the heading text and passing the styles of it
+        title = Paragraph( "PR" , title_style )
+        
+        # creates a Table Style object and in it,
+        # defines the styles row wise
+        # the tuples which look like coordinates
+        # are nothing but rows and columns
+        
+
+        style = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "GRID" , (0, 0), ( 5, 2 ), 0, colors.black ),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTER" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+                ('FONTNAME', (0,0), (-1, 0), 'Times-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 11),
+
+
+            ]
+        )
+
+        style2 = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "GRID" , (0, 0), ( 2 , 3 ), 0, colors.black ),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTER" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+                ('FONTNAME', (1,0), (1, -1), 'Times-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 11),
+
+
+
+            ]
+        )
+
+        style3 = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "GRID" , (1, 0), (2 , 0), 0, colors.black ),
+                ( "GRID" , (2, 1), (2 , 1), 0, colors.black ),
+                ( 'BOX',   (1 , 0),  (1 , 3),  1,colors.black),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTRE" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+                ('VALIGN',(-1,2),(-1,2),'TOP'),
+                ('FONTNAME', (0,0), (0,0), 'Times-Bold'),
+                ('FONTNAME', (0,3), (0,3), 'Times-Bold'),
+                ('FONTSIZE', (0, 0), (0, 0), 11),
+
+
+            ]
+        )
+
+        style4 = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "GRID" , (0, 0), (-1 , -1), 0, colors.black ),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTRE" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+                ('FONTNAME', (0,0), (-1,-1), 'Times-Bold'),
+
+
+
+            ]
+        )
+
+        style5 = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "GRID" , (2, 1), (-1 , -1), 0, colors.black ),
+                ( "BOX" , (0, 0), (4 , 0), 0, colors.black ),
+                ( 'BOX',   (1 , 1),  (1 , 3),  1,colors.black),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "LEFT" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+                ('FONTNAME', (1,1), (2,-1), 'Times-Bold'),
+
+
+
+            ]
+        )
+
+        style6 = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "LEFT" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE')
+
+
+            ]
+        )
+        
+        style7 = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTRE" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+                ('FONTNAME', (0,0), (-1,-1), 'Times-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 13),
+
+            ]
+        )
+
+        style8 = TableStyle(
+            [
+                
+                ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+                ( "GRID" , (0, 0), ( -1, -1 ), 0, colors.black ),
+                ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+                ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTER" ),
+                ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+                ('FONTSIZE', (0, 0), (-1, 0), 11),
+            
+            ]
+        )
+
+        
+        # creates a table object and passes the style to it
+        table1 = Table( DATA , style = style, colWidths=(1.5*cm, 4.5*cm, 2*cm, 2*cm, 2*cm, 6*cm), rowHeights=(1*cm, 1*cm,))
+        table3 = Table( DATA3 , style = style3, colWidths=(6*cm, 6*cm, 6*cm), rowHeights=(1*cm, 1*cm, 1*cm, 1*cm,))
+        table4 = Table( DATA4 , style = style4, colWidths=(9*cm, 9*cm), rowHeights=(1*cm))
+        table5 = Table( DATA5 , style = style5, colWidths=(6.4*cm, 6.4*cm, 2.9*cm, 2.3*cm), rowHeights=(1*cm, 1*cm, 1*cm, 1*cm))
+        table6 = Table( DATA6 , style = style6, colWidths=(18*cm))
+        table7 = Table( DATA7 , style = style7, colWidths=(18*cm),  rowHeights=(1*cm, 1*cm))
+
+
+        # table = [ title , table3, table1, table2, table4, table5, table6, table7, table8])
+        # table.set(Style)
+        flow_obj = []
+        frame1 = Frame(0,10,600,800)
+        frame2 = Frame(0,10,600,800)
+        flow_obj.append(title)
+        flow_obj.append(table3)
+        flow_obj.append(table1)
+        flow_obj.append(table4)
+        flow_obj.append(table5)
+        flow_obj.append(table6)
+        flow_obj.append(table7)
+        pdf1 = canvas.Canvas(path)
+        frame1.addFromList(flow_obj, pdf1)
+
+       
+
+        # building pdf
+        pdf1.save()
+
+        if pathneeded == True:
+
+            return path
+
+
+        print('-')
+        print('-')
+        print('-')
+        print('-')
+        print('-')
+
+        print(path)
+
+
+
+        
+        return FileResponse(open(path, 'rb'), content_type='application/pdf')
+
+
+
+
+
+
+
+@distributor_required(login_url='login')
+def showroom_send_pr(request, request_id):
+
+    a = showroom_view_pr(request, request_id, pathneeded = True)
+    print('----path---')
+    print(a)
+    try:
+        ins = showroom_request.objects.get(id = request_id)
+        ins.pr_pdf = a
+        ins.save()
+    except showroom_request.DoesNotExist:
+        showroom_request.objects.create(showroom_request = instance, pr_pdf = a)
+
+    
+    instance = showroom_request.objects.get(id = request_id)
+    data = showroom_req.objects.filter(showroom_request = instance)
+
+    msg = "PR send sucessfullly"
+    data = showroom_request.objects.all()
+
+    payment_update = []
+
+    for i in data:
+        try:
+            a = showroom_payment_details.objects.get(showroom_request = i)
+            print('priting a ')
+            print(a)
+        except showroom_payment_details.DoesNotExist:
+            a = None
+        if a:
+            payment_update.append(a)
+        else:
+            payment_update.append('')
+
+    data = zip(data, payment_update)
+    data = list(data)
+
+    context = {
+        'data': data,
+        'msg': msg,
+    }
+
+    return render(request, 'distributor/view_request.html', context)
+
+    
+
+
+
+
+from showroom.forms import *
+
+@distributor_required(login_url="login")
+def view_payment_detials(request, payment_id):
+
+    data = showroom_payment_details.objects.get(id = payment_id)
+
+    data = showroom_payment_details_From(instance = data)
+
+    context = {
+        'form' : data
+    }
+
+    return render(request, 'distributor/view_payment.html', context)
+
+
+
+
+
 
 
 @distributor_required(login_url='login')

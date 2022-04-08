@@ -327,8 +327,6 @@ def view_distributor_request(request):
 
     data = distributor_request.objects.all()
 
-    data = distributor_request.objects.all()
-
     payment_update = []
 
     for i in data:
@@ -834,9 +832,24 @@ def distributor_send_pr(request, request_id):
     data = distributor_req.objects.filter(distributor_request = instance)
 
     msg = "PR send sucessfullly"
-
     data = distributor_request.objects.all()
 
+    payment_update = []
+
+    for i in data:
+        try:
+            a = distributor_payment_details.objects.get(distributor_request = i)
+            print('priting a ')
+            print(a)
+        except distributor_payment_details.DoesNotExist:
+            a = None
+        if a:
+            payment_update.append(a)
+        else:
+            payment_update.append('')
+
+    data = zip(data, payment_update)
+    data = list(data)
 
     context = {
         'data': data,
@@ -844,8 +857,6 @@ def distributor_send_pr(request, request_id):
     }
 
     return render(request, 'transactions/view_distributor_request.html', context)
-
-
 
     
 
