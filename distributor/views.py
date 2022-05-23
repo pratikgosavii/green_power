@@ -296,17 +296,19 @@ def add_outward(request):
         bike_numbers = list(bike_numbers)
         bike_numbers1 = list(bike_numbers1)
 
+        bike_numbers_final = bike_numbers.copy()
+
         data = zip(bike_numbers, bike_numbers1)
         for i,y in data:
 
             if i.chasis_no in y.bike_number.chasis_no:
 
-                bike_numbers.remove(i)
+                bike_numbers_final.remove(i)
 
         context = {
             'form': forms,
             'showroom_data' : showroom_data,
-            'bike_numbers' : bike_numbers,
+            'bike_numbers' : bike_numbers_final,
             
         }
         return render(request, 'distributor/add_outward.html', context)
