@@ -440,7 +440,10 @@ def list_inward(request):
     data = showroom_inward.objects.filter(user = request.user)
 
     z = showroom.objects.get(user = request.user)
-    distributor = z.Distributor.name
+    if z.Distributor:
+        distributor = z.Distributor.name
+    else:
+        distributor = None
 
     context = {
         'data': data,
@@ -505,7 +508,11 @@ def detail_list_inward(request):
             data1.append(a)
 
     z = showroom.objects.get(user = request.user)
-    distributor = z.Distributor.name
+
+    if z.Distributor:
+        distributor = z.Distributor.name
+    else:
+        distributor = None
 
     data = list(chain.from_iterable(data1))
     
