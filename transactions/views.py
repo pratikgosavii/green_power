@@ -155,7 +155,7 @@ def add_inward(request):
 
                     test = stock.objects.get(variant=instance.variant, color = color_data)
 
-                    test.total_bike = test.total_bike + instance.bike_qty
+                    test.total_bike = test.total_bike + 1
 
                     test.save()
 
