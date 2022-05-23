@@ -1040,9 +1040,26 @@ def add_outward(request):
 
         showroom_data = showroom.objects.filter(Distributor=None, status = "active")
 
+        bike_numbers = bike_number.objects.all()
+        bike_numbers1 = bike_number_outward.objects.all()
+
+        bike_numbers = list(bike_numbers)
+        bike_numbers1 = list(bike_numbers1)
+
+        data = zip(bike_numbers, bike_numbers1)
+        for i,y in data:
+
+            if i.chasis_no in y.bike_number.chasis_no:
+
+                bike_numbers.remove(i)
+
+        print(bike_numbers)
+        print(bike_numbers1)
+
         context = {
             'form': forms,
-            'showroom_data' : showroom_data
+            'showroom_data' : showroom_data,
+            'bike_numbers' : bike_numbers,
             
         }
         return render(request, 'transactions/add_outward.html', context)

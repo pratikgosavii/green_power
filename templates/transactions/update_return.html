@@ -5,7 +5,6 @@
 {% block title %}Create Product{% endblock title %}
 
 {% block breadcrumbs %}
-
 <div >
     <div class="breadcrumbs-inner">
         <div class="row m-0">
@@ -29,11 +28,12 @@
 {% block content %}
 
 
+
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
-                <strong class="card-title">Add Outward</strong>
+                <strong class="card-title">Add Company Goods</strong>
             </div>
             <div class="card-body">
                 <!-- Credit Card -->
@@ -46,7 +46,7 @@
                                 <label for="name" class="control-label mb-1">Showroom</label>
                                 {{ form.showroom }}
                                 <small class="text-danger"> {{ form.showroom.errors.as_text }} </small>
-                                
+
                             </div>
 
                             <div class="form-group">
@@ -59,7 +59,7 @@
                             <label for="inputStatus">Agent</label>
                             <select id="agent" class="form-control-sm custom-select" name="agent">
 
-                           
+                        
 
                             </select>
 
@@ -80,7 +80,7 @@
 
                             <div>
                                 <button id="payment-button" type="submit" class="btn btn-lg btn-info btn-block">
-                                    <span id="payment-button-amount">Create Product</span>
+                                    <span id="payment-button-amount">Update Product</span>
                                 </button>
                             </div>
                         </form>
@@ -94,7 +94,37 @@
 </div>
 
 
+{% endblock content %}
+
+
+{% block js %}
+
 <script>
+    
+   
+    //to select dropdown value one it get load using above code
+    
+    
+    // get the selected subject ID from the HTML dropdown list 
+    $.ajax({                       // initialize an AJAX request
+        type: "POST",
+        url: '{% url "get_agent_ajax" %}',
+        data: {
+            'showroom_id': {{ showroom_id }},      // add the country id to the POST parameters
+            'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   // `data` is from `get_topics_ajax` view function
+            let html_data = '<option selected disabled>------------</option>';
+            data.forEach(function (data) {
+        
+                html_data += `<option value="${data.id}" >${data.name}</option>` 
+            });
+            $("#agent").html(html_data); // replace the contents of the topic input with the data that came from the server
+            $("#agent").val({{ agent_ID }});
+        }
+    });
+  
+
 
     
     $("#showroom").change(function () {
@@ -117,8 +147,8 @@
         });
     });
 
-    
-    
-</script>
 
-{% endblock content %}
+
+</script>
+ 
+{% endblock js %}

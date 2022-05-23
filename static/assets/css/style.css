@@ -1203,7 +1203,26 @@ header .form-inline {
 .content {
   float: left;
   padding: 1.875em;
-  width: 100%; }
+  width: 100%;
+  height: calc(100vh - 55px);
+  position: relative;
+  z-index: 1;
+}
+
+.content:before {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-image: url(../../images/logo_1.jpg);
+  background-position: center; background-repeat: no-repeat;
+  z-index: -1;
+  background-size: contain;
+  opacity: 0.4;
+}
+
 
 .card {
   margin-bottom: 1.875em;

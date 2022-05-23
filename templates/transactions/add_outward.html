@@ -12,7 +12,7 @@
 
 {% block breadcrumbs %}
 
-<div class="breadcrumbs">
+<div >
   <div class="breadcrumbs-inner">
     <div class="row m-0">
       
@@ -46,17 +46,18 @@
                 <label for="name" class="control-label mb-1">Chasis No</label>
                 <br /><br />
                 <div class="form-group" style="display: flex">
-                  <label class="control-label mb-1" style="margin-right: 16px"
-                    >1</label
-                  >
+                                  <!-- Dropdown --> 
+                  <select id='chasis_no1' style='width: 400px;'>
+                    <option value='0'>Select Chasis No</option> 
+                    {% for i in bike_numbers %}
 
-                  <input
-                    type="text"
-                    id="chasis_no1"
-                    name="chasis_no"
-                    class="form-control modified"
-                    maxlength="120"
-                  />
+                      <option value='{{ i.chasis_no }}'>{{ i.chasis_no }}</option> 
+
+                    {% endfor %}
+                    
+                  </select>
+
+
                   
                   <button
                     class="btn btn-info"
@@ -400,5 +401,15 @@
       },
     });
   }
+
+    $(document).ready(function(){
+  
+      // Initialize select2
+      $("#chasis_no1").select2();
+    
+      
+    });
+
+  
 </script>
 {% endblock js %} 

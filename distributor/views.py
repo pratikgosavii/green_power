@@ -269,15 +269,44 @@ def add_outward(request):
 
         forms = distributor_outward_Form()
 
-
         distributor_data = distributor.objects.get(user=request.user)
-        print(distributor_data)
+  
         showroom_data = showroom.objects.filter(Distributor = distributor_data)
         print(showroom_data)
+
+
+
+
+
+        bike_numbers = []
+
+        distributor_in_ = outward.objects.filter(distributor = distributor_data)
+        
+        for i in distributor_in_:
+            bike_number_ = bike_number_outward.objects.filter(outward = i)
+
+            for y in bike_number_:
+                bike_numbers.append(y.bike_number)
+
+        match_inward_data = distributor_inward.objects.filter(user = request.user)
+
+       
+        bike_numbers1 = distributor_bike_number_outward.objects.all()
+
+        bike_numbers = list(bike_numbers)
+        bike_numbers1 = list(bike_numbers1)
+
+        data = zip(bike_numbers, bike_numbers1)
+        for i,y in data:
+
+            if i.chasis_no in y.bike_number.chasis_no:
+
+                bike_numbers.remove(i)
 
         context = {
             'form': forms,
             'showroom_data' : showroom_data,
+            'bike_numbers' : bike_numbers,
             
         }
         return render(request, 'distributor/add_outward.html', context)
