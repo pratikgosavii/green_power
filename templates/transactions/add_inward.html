@@ -217,12 +217,27 @@
         for (i = 0; i < chasis_no.length; i++) {
 
             if (chasis_no_arr.includes(chasis_no[i].value)){
+                $("#message_div").css("display","contents");
+                var div = document.getElementById('message');
+            
+                div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> Chasis No <strong>  ` +  chasis_no[i].value + `</strong>` + ` Entered multiple times <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
                 return false;
             } 
             if (motor_no_arr.includes(motor_no[i].value)){
+                var div = document.getElementById('message');
+            
+                div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> Motor No <strong> ` +  motor_no[i].value  + `</strong>` + ` Entered multiple times <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                        
                 return false;
             } 
             if (controller_no_arr.includes(controller_no[i].value)){
+                var div = document.getElementById('message');
+            
+                div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> Controller No  <strong>` +  controller_no[i].value  + `</strong>` + ` Entered multiple times <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                        
                 return false;
             } 
             chasis_no_arr.push(chasis_no[i].value);

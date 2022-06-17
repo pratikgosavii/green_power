@@ -312,6 +312,18 @@ def add_outward(request):
         print('1')
         check_condition = None
 
+
+        outward_data = showroom_bike_number_outward.objects.all()
+
+
+        for i in outward_data:
+
+            print('in for')
+
+            if i.bike_number.chasis_no == chasis_no:
+                return JsonResponse({'status' : 'Chasis No already exsist in outward'}, safe=False)
+
+
         for i in inward_data:
             
             check_outward = i.company_outward
@@ -323,11 +335,14 @@ def add_outward(request):
                 print('--------distributor--------')
                 check_outward = i.distributor_outward
 
+                numebrs = check_outward.related.all()
 
-                check_data = distributor_bike_number_outward.objects.filter(outward = check_outward, bike_number__chasis_no=chasis_no)
-                print(check_data)
+                final_check = numebrs.filter(bike_number__chasis_no = chasis_no)
 
-                if check_data:
+
+
+
+                if final_check:
                    check_condition = True
                    break
 
@@ -335,9 +350,14 @@ def add_outward(request):
 
                 check_outward = i.company_outward
 
-                check_data = bike_number_outward.objects.filter(outward = check_outward,  bike_number__chasis_no__in=chasis_no)
+                print('check_outward')
+                print(check_outward)
+                print(chasis_no)
 
-                check_condition = None
+                numers = check_outward.outward_related.all()
+
+                check_data = numers.filter(bike_number__chasis_no = chasis_no)
+
 
                 if check_data:
 
@@ -947,11 +967,14 @@ def update_outward(request, outward_id):
 @showroom_required(login_url='login')
 def delete_outward(request, outward_id):
 
+
+    print('hereghgv')
+
     try:
-        con = showroom_outward.objects.filter(id = outward_id).first()
+        con = showroom_outward.objects.get(id = outward_id)
         print('1')
         print(con)
-    except distributor_outward.DoesNotExist:
+    except showroom_outward.DoesNotExist:
 
         print('something went wrong')
         return HttpResponseRedirect(reverse('showroom_list_outward'))
@@ -960,22 +983,22 @@ def delete_outward(request, outward_id):
 
         try:
 
-            con1 = showroom_bike_number_outward.objects.filter(outward = con)
+            con1 = showroom_bike_number_outward.objects.get(outward = con)
             print('rpting con')
             print(con1)
-            for z in con1:
-
-                test = showroom_stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color)
-                test.total_bike = test.total_bike + 1
-                test.save()
+            
+            print(con1.bike_number.inward.variant, con1.bike_number.color)
+            test = showroom_stock.objects.get(variant = con1.bike_number.inward.variant, color = con1.bike_number.color, user = request.user)
+            test.total_bike = test.total_bike + 1
+            test.save()
             con.delete()
             con1.delete()
 
             return HttpResponseRedirect(reverse('showroom_list_outward'))
 
 
-        except:
-            print('something went wrong')
+        except showroom_stock.DoesNotExist:
+            print('something went wrongssdsd')
             return HttpResponseRedirect(reverse('showroom_list_outward'))
 
 @showroom_required(login_url='login')

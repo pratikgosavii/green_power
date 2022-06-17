@@ -48,7 +48,7 @@ class distributor_outward(models.Model):
 class distributor_bike_number_outward(models.Model):
 
     bike_number = models.ForeignKey(bike_number, on_delete=models.CASCADE, unique=True)
-    outward = models.ForeignKey(distributor_outward, on_delete=models.CASCADE)
+    outward = models.ForeignKey(distributor_outward, on_delete=models.CASCADE, related_name="related")
     # battery_number = models.CharField(max_length=225)
     def __str__(self):
         return self.bike_number.chasis_no

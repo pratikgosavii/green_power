@@ -956,6 +956,8 @@ def add_outward(request):
 
             for i in chasis_no:
 
+                print('in for')
+
 
                 bike_data = bike_number.objects.get(chasis_no = i)
 
@@ -978,6 +980,9 @@ def add_outward(request):
                 for i in chasis_no:
 
                     bike_data = bike_number.objects.get(chasis_no = i)
+
+                    print('bike data')
+                    print(bike_data)
 
                     try: 
 
@@ -1003,28 +1008,48 @@ def add_outward(request):
 
             elif showroom_data:
 
+                print('in showroom')
+
                 user_data = showroom.objects.get(id = showroom_data)
                 user_data = user_data.user
 
                 showroom_inward.objects.create(company_outward = forms.instance, user = user_data)
                 for i in chasis_no:
 
+                    print('in in for')
+
                     bike_data = bike_number.objects.get(chasis_no = i)
+
+                    print('bike_Data')
+                    print(bike_data)
+
                     try: 
-                        bike_number_outward.objects.create(bike_number = bike_data, outward = instance)
+                        a = bike_number_outward.objects.create(bike_number = bike_data, outward = instance)
+                        print(a)
 
                         try: 
+
+
+
+                            print('in try')
                             test = showroom_stock.objects.get(variant=bike_data.inward.variant, color = bike_data.color, user = user_data)
 
                             test.total_bike = test.total_bike + 1
                             test.save()
 
+                            print('in try')
+
                         except showroom_stock.DoesNotExist:
-                            showroom_stock.objects.create(bike=bike_data.inward.bike, total_bike = 1, user = user_data)
+                            print('in except')
+                            a = showroom_stock.objects.create(variant=bike_data.inward.variant, color = bike_data.color, total_bike = 1, user = user_data)
+                            print('created')
+                            print(a)
+                            return JsonResponse({'status' : 'done'}, safe=False)
 
 
                             
                     except IntegrityError as e: 
+                        print('hereee')
                         instance.delete()
                         return JsonResponse({'other_error' : 'Unique contraint fail'}, safe=False)
                 return JsonResponse({'status' : 'done'}, safe=False)
@@ -1159,63 +1184,132 @@ def delete_outward(request, outward_id):
 
     if con:
 
-        data = bike_number_outward.objects.filter(outward = con)
+        if con.distributor:
 
-        for y in data:
-                    
+
+            data = bike_number_outward.objects.filter(outward = con)
+
+            for y in data:
+                        
+                try:
+                    data1 = bike_number_outward.objects.get(bike_number = y.bike_number)
+                except bike_number_outward.DoesNotExist:
+                    data1 = None
+                    pass
+                
+
+                if data1:
+
+
+                    a = distributor_bike_number_outward.objects.all()
+
+                    for y in a:
+
+                        if y.bike_number.chasis_no in data1.bike_number.chasis_no:
+
+                            msg  = "Cant delete Outward, bike is already in outward of distributor hn"
+
+                            data = outward.objects.all()
+
+                            context = {
+                                'data': data,
+                                'msg': msg,
+                            }
+
+                            return render(request, 'transactions/list_outward.html', context)
+                                
+
+
             try:
-                data1 = bike_number_outward.objects.get(bike_number = y.bike_number)
-            except bike_number_outward.DoesNotExist:
-                data1 = None
-                pass
+
+                con1 = bike_number_outward.objects.filter(outward = con)
+
+                for z in con1:
+
+                    test = stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color)
+                    test1 = distributor_stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color, user = con.distributor.user)
+                    test.total_bike = test.total_bike + 1
+                    test.save()
+                    test1.total_bike = test1.total_bike - 1
+                    test1.save()
+
+                con.delete()
+                con1.delete()
+
+                return HttpResponseRedirect(reverse('list_outward'))
+
+
+
+            except stock.DoesNotExist:
+
+                print('something went wrong2')
+                return HttpResponseRedirect(reverse('list_outward'))
+
+        else:
+
             
 
-            if data1:
+            data = bike_number_outward.objects.filter(outward = con)
 
-                a = distributor_bike_number_outward.objects.all()
-
-                for y in a:
-
-                    if y.bike_number.chasis_no in data1.bike_number.chasis_no:
-
-                        msg  = "Cant delete Outward, bike is already in outward of distributor hn"
-
-                        data = outward.objects.all()
-
-                        context = {
-                            'data': data,
-                            'msg': msg,
-                        }
-
-                        return render(request, 'transactions/list_outward.html', context)
+            for y in data:
                         
+                try:
+                    data1 = bike_number_outward.objects.get(bike_number = y.bike_number)
+                except bike_number_outward.DoesNotExist:
+                    data1 = None
+                    pass
+                
 
-    if con:
-
-        try:
-
-            con1 = bike_number_outward.objects.filter(outward = con)
-
-            for z in con1:
-
-                test = stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color)
-                test1 = distributor_stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color, user = con.distributor.user)
-                test.total_bike = test.total_bike + 1
-                test.save()
-                test1.total_bike = test1.total_bike - 1
-                test1.save()
-
-            con.delete()
-            con1.delete()
-
-            return HttpResponseRedirect(reverse('list_outward'))
+                if data1:
 
 
+                    a = showroom_bike_number_outward.objects.all()
 
-        except stock.DoesNotExist:
+                    for y in a:
 
-            print('something went wrong2')
-            return HttpResponseRedirect(reverse('list_outward'))
+                        if y.bike_number.chasis_no in data1.bike_number.chasis_no:
+
+                            msg  = "Cant delete Outward, bike is already in outward of distributor hn"
+
+                            data = outward.objects.all()
+
+                            context = {
+                                'data': data,
+                                'msg': msg,
+                            }
+
+                            return render(request, 'transactions/list_outward.html', context)
+                                
+
+
+            try:
+
+                con1 = bike_number_outward.objects.filter(outward = con)
+
+                for z in con1:
+
+                    test = stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color)
+                    test1 = showroom_stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color, user = con.showroom.user)
+                    test.total_bike = test.total_bike + 1
+                    test.save()
+                    test1.total_bike = test1.total_bike - 1
+                    test1.save()
+
+                con.delete()
+                con1.delete()
+
+                return HttpResponseRedirect(reverse('list_outward'))
+
+
+
+            except stock.DoesNotExist:
+
+                print('something went wrong2')
+                return HttpResponseRedirect(reverse('list_outward'))
+
+
+
+
 
 
 @login_required(login_url="login")

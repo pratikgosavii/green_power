@@ -14,37 +14,19 @@ def dashboard(request):
 
     if request.user.is_superuser: 
 
-        request_ = []
         stock_ = []
-        inward_ = []
-        outward_ = []
 
         stock_count = stock.objects.all()
-        inward_data = inward.objects.all()
-        outward_data = outward.objects.all()
-        request_data1 = distributor_req.objects.all()
-        request_data2 = showroom_request.objects.filter(distributor = None)
+        distributor_count = distributor.objects.all().count()
+        dealers_count = showroom.objects.all().count()
 
         for i in stock_count:
             stock_.append(i.total_bike)
 
-        for i in outward_data:
-            outward_.append(i.bike_qty)
-
-        for i in request_data1:
-            request_.append(i.bike_qty)
-
-        for i in request_data2:
-            request_.append(i.bike_qty)
-
-        for i in inward_data:
-            inward_.append(i.bike_qty)
-
-        
-        request_ = sum(request_)
+      
         stock_ = sum(stock_)
-        inward_ = sum(inward_)
-        outward_ = sum(outward_)
+
+
 
     elif request.user.is_distributor:
 
@@ -131,9 +113,8 @@ def dashboard(request):
     context = {
         
         'stock_count' : stock_,
-        'outward_data' : outward_,
-        'inward_' : inward_,
-        'request_co' : request_,
+        'distributor_count' : distributor_count,
+        'dealers_count' : dealers_count
         
     }
 

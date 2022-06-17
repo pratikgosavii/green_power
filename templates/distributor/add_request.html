@@ -246,7 +246,7 @@
             success: function (data) {   // `data` is from `get_topics_ajax` view function
                 //window.location.href = http + "{% url 'list_inward' %}"
 
-                if (data.status == 'done'){
+                if (data.data == 'done'){
                     window.location.href = "{% url 'distributor_list_request' %}";
                 }
 

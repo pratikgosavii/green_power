@@ -272,11 +272,6 @@ def add_outward(request):
         distributor_data = distributor.objects.get(user=request.user)
   
         showroom_data = showroom.objects.filter(Distributor = distributor_data)
-        print(showroom_data)
-
-
-
-
 
         bike_numbers = []
 
@@ -298,10 +293,10 @@ def add_outward(request):
 
         bike_numbers_final = bike_numbers.copy()
 
-        data = zip(bike_numbers, bike_numbers1)
-        for i,y in data:
+       
+        for i in bike_numbers:
 
-            if i.chasis_no in y.bike_number.chasis_no:
+            if i in bike_numbers1:
 
                 bike_numbers_final.remove(i)
 
@@ -653,7 +648,8 @@ def add_request(request):
             if i.total_bike > 0:
                 list1.append(i)
 
-        
+        print(stock_data)
+        print(list1)
 
 
         context = {

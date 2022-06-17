@@ -80,7 +80,7 @@ class bike_number(models.Model):
 class bike_number_outward(models.Model):
 
     bike_number = models.ForeignKey(bike_number, on_delete=models.CASCADE, unique = True)
-    outward = models.ForeignKey(outward, on_delete=models.CASCADE)
+    outward = models.ForeignKey(outward, on_delete=models.CASCADE, related_name="outward_related")
     battery_number = models.CharField(max_length=225)
 
     
