@@ -1,0 +1,372 @@
+{% extends 'base/base.html' %} 
+{% block head %}
+
+<style>
+  fieldset {
+  }
+</style>
+
+{% endblock %} 
+
+{% block title %}Create Product{% endblock title %} 
+
+{% block breadcrumbs %}
+
+<div >
+  <div class="breadcrumbs-inner">
+    <div class="row m-0">
+      
+      
+    </div>
+  </div>
+</div>
+{% endblock breadcrumbs %} 
+
+{% block content %} 
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <strong class="card-title">Add Outward</strong>
+      </div>
+      <div class="card-body">
+        <!-- Credit Card -->
+        <div id="pay-invoice">
+          <div class="card-body">
+            <div class="content" id="message_div" style="display: none">
+              <!-- Animated -->
+              <div class="animated fadeIn" id="message"></div>
+            </div>
+
+            <form id="outward_form">
+              {% csrf_token %}
+
+              <div id="chassis_no_div">
+                <label for="name" class="control-label mb-1">Chasis No</label>
+                <br /><br />
+                <div class="form-group" style="display: flex">
+                                  <!-- Dropdown --> 
+                  <select id='chasis_no1' style='width: 400px;'>
+                    <option value='0'>Select Chasis No</option> 
+                    {% for i in bike_numbers %}
+
+                      <option value='{{ i }}'>{{ i }}</option> 
+
+                    {% endfor %}
+                    
+                  </select>
+
+
+                  
+                  <button
+                    class="btn btn-info"
+                    style="margin-left: 10px"
+                    type="button"
+                    onclick="dynamic_textbox()"
+                  >
+                    Add
+                  </button>
+                  <button
+                    class="btn btn-info"
+                    style="margin-left: 10px"
+                    type="button"
+                    onclick="ajax_submit()"
+                  >
+                    submit
+                  </button>
+                </div>
+                <div  class="text-danger">
+                  <small id="chasis_error" style="margin-left:10px"></small>
+                </div>
+                  <div class="chips"></div>
+              </div>
+
+              <div
+                style="border: 1px solid grey; padding: 25px; margin-top: 36px"
+              >
+                <div class="form-group">
+                  <label for="name" class="control-label mb-1">Variant</label>
+                  <input
+                    type="text"
+                    name="bike"
+                    class="form-control"
+                    id="bike"
+                    maxlength="120"
+                    required=""
+                    readonly
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="name" class="control-label mb-1">Motor No</label>
+                  <input
+                    type="text"
+                    name="motor_no"
+                    class="form-control"
+                    id="motor_no"
+                    maxlength="120"
+                    required=""
+                    readonly
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="name" class="control-label mb-1"
+                    >Controller No</label
+                  >
+                  <input
+                    type="text"
+                    name="controller_no"
+                    class="form-control"
+                    id="controller_no"
+                    maxlength="120"
+                    required=""
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <br />
+
+              <fieldset style="" id="field_drop">
+                <legend
+                  id="drop_"
+                  style="
+                    font-size: 15px;
+                    width: 40%;
+                    max-width: 100%;
+                    padding: 12px;
+                    color: red;
+                    display: none;
+                  "
+                >
+                  Choose one dropdown
+                </legend>
+                {% comment %}
+                <div
+                  style="
+                    border: 1px solid red;
+                    padding: 25px;
+                    margin-top: 36px;
+                    display: none;
+                  "
+                >
+                  {% endcomment %}
+                  
+                  {% comment %}
+                </div>
+                {% endcomment %}
+              </fieldset>
+
+              <div>
+                <button
+                  id="payment-button"
+                  type="submit"
+                  class="btn btn-lg btn-info btn-block"
+                >
+                  <span id="payment-button-amount">Create Product</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- .card -->
+  </div>
+  <!--/.col-->
+</div>
+
+{% endblock content %}
+
+{% block js %}
+
+<script>
+
+  var text_box_count = 2;
+
+  const chasisNo = document.querySelector('#chasis_no1');
+  const chips = document.querySelector(".chips");
+
+  const chasisNoList = new Set();
+
+  function spam_delete(d){
+    alert('yes')
+    console.log(d)
+    chasisNoList.delete(d)
+    render_chips(chasisNoList)
+    
+  }
+
+  function render_chips(arr){
+
+    let ll = [...arr].map(d => {
+      return `<div class="btn btn-primary mx-2">
+       ${ d } <span  class="badge badge-light ml-2" onclick="spam_delete('${d}')" >x</span>
+      </div>`
+     }).join('')
+
+    chips.innerHTML = ll;
+      
+  }
+
+
+
+  function dynamic_textbox() {
+
+    if(chasisNoList.has(chasisNo.value)) {
+      alert("already present")
+    } 
+    
+    if(!chasisNoList.has(chasisNo) && chasisNo.value != '') {
+      chasisNoList.add(chasisNo.value);
+      chasisNo.value = '';
+      console.log(chasisNoList)
+
+      render_chips(chasisNoList)
+    }
+
+
+
+
+
+  
+    
+
+    document.getElementById("bike").value = "";
+    document.getElementById("motor_no").value = "";
+    document.getElementById("controller_no").value = "";
+
+    
+  }
+
+  function ajax_submit() {
+    d_readonly = "chasis_no" + (text_box_count - 1);
+
+    chasis_no = document.getElementById('chasis_no1').value;
+
+    $.ajax({
+      cache: false, // initialize an AJAX request
+      type: "POST",
+      url: "{% url 'get_outward_data' %}",
+      data: {
+        csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+        chasis_no: chasis_no, // add the country id to the POST parameters
+      },
+
+      success: function (data) {
+        // `data` is from `get_topics_ajax` view function
+        //window.location.href = http + "{% url 'list_inward' %}"
+
+        if (data.objectt) {
+          var a = JSON.parse(data.objectt);
+          console.log(a[0].fields);
+          document.getElementById("bike").value = a[0].fields.inward;
+          document.getElementById("motor_no").value = a[0].fields.motor_no;
+          document.getElementById("controller_no").value =
+            a[0].fields.controller_no;
+        }
+      },
+    });
+  }
+
+  document
+    .getElementById("outward_form")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+     
+      let chasis_no_arr = [];
+
+      if (chasisNoList.size == 0 || chasisNoList == '') {
+        
+        document.getElementById('chasis_error').innerHTML = 'Please enter chasis no'
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
+        return false;
+      } else {
+        let form_data = {
+          csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+          chasis_no: [...chasisNoList],
+         
+        };
+
+
+        submit_form(form_data);
+      }
+    });
+
+  function submit_form(form_data) {
+    $.ajax({
+      cache: false, // initialize an AJAX request
+      type: "POST",
+      url: "{% url 'showroom_add_return' %}",
+      data: form_data,
+
+      success: function (data) {
+        // `data` is from `get_topics_ajax` view function
+        //window.location.href = http + "{% url 'list_inward' %}"
+        alert(data.status);
+        if (data.status == "done") {
+          window.location.href = "{% url 'list_outward' %}";
+        } else if (data.error !== undefined) {
+          alert("here");
+          var a = JSON.parse(data.error);
+
+          console.log(a);
+          document.body.scrollTop = document.documentElement.scrollTop = 0;
+          $("#message_div").css("display", "contents");
+          var div = document.getElementById("message");
+          for (var name in a) {
+            for (var i in a[name]) {
+              console.log(name);
+              div.innerHTML +=
+                `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> <strong>` +
+                name +
+                ` ` +
+                `</strong>` +
+                a[name][i].message +
+                `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+              console.log(a[name][i].message);
+            }
+          }
+        } else if(data.other_error != null){
+          alert("in else");
+          alert(data.other_error);
+          console.log(data.other_error);
+          console.log(data);
+          document.body.scrollTop = document.documentElement.scrollTop = 0;
+          $("#message_div").css("display", "contents");
+          var div = document.getElementById("message");
+          div.innerHTML +=
+            `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +
+            data.other_error +
+            `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+        }
+
+        else{
+          alert("in else last");
+          alert(data.status);
+          console.log(data);
+          document.body.scrollTop = document.documentElement.scrollTop = 0;
+          $("#message_div").css("display", "contents");
+          var div = document.getElementById("message");
+          div.innerHTML +=
+            `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +
+            data.status +
+            `<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+        }
+      },
+    });
+  }
+
+    $(document).ready(function(){
+  
+      // Initialize select2
+      $("#chasis_no1").select2();
+    
+      
+    });
+
+  
+</script>
+{% endblock js %} 

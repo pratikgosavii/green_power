@@ -79,6 +79,15 @@
                 </li>
 
                 <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-paper-plane"></i>Return</a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-id-card-o"></i><a href="{% url 'add_return' %}">Add</a></li>
+                        <li><i class="fa fa-th"></i><a href="{% url 'list_return' %}">View</a></li>
+                        <li><i class="fa fa-th"></i><a href="{% url 'list_showroom_return' %}">View shoroom return</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-paper-plane"></i>Placeorder</a>
                     <ul class="sub-menu children dropdown-menu">
                         <li><i class="fa fa-id-card-o"></i><a href="{% url 'distributor_add_request' %}">Add</a></li>
@@ -134,6 +143,14 @@
                 </li>
 
                 <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-paper-plane"></i>Return</a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-id-card-o"></i><a href="{% url 'showroom_add_return' %}">Add</a></li>
+                        <li><i class="fa fa-th"></i><a href="{% url 'showroom_list_return' %}">View</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-paper-plane"></i>Placeorder</a>
                     <ul class="sub-menu children dropdown-menu">
                         <li><i class="fa fa-id-card-o"></i><a href="{% url 'showroom_add_request' %}">Add</a></li>
@@ -172,6 +189,13 @@
                             <li><i class="fa fa-th"></i><a href="{% url 'list_outward' %}">View</a></li>
                         </ul>
                     </li>
+                    <li class="menu-item-has-children dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-users"></i>Return</a>
+                        <ul class="sub-menu children dropdown-menu">
+                            <li><i class="fa fa-id-card-o"></i><a href="{% url 'admin_list_return_distributor' %}">View Distributor Return</a></li>
+                            <li><i class="fa fa-id-card-o"></i><a href="{% url 'admin_list_return_showroom' %}">View Showroom Return</a></li>
+                        </ul>
+                    </li>
 
                     <li class="menu-item-has-children dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-users"></i>View Orders</a>
@@ -187,6 +211,13 @@
                         <ul class="sub-menu children dropdown-menu">
                             <li><i class="fa fa-th"></i><a href="{% url 'list_stock' %}">View</a></li>
                         </ul>
+                    </li>
+
+
+
+                    <li class="menu-title">Reports</li><!-- /.menu-title -->
+                    <li class="">
+                        <a href="{% url 'generate_gstr1' %}"><i class="menu-icon fa fa-laptop"></i>GSTR-1 </a>
                     </li>
 
                 {% endif %}

@@ -50,6 +50,7 @@ class outward(models.Model):
     bike_qty = models.IntegerField()
     
 
+
 class stock(models.Model):
 
     variant =  models.ForeignKey(variant, on_delete=models.CASCADE)
@@ -82,7 +83,10 @@ class bike_number_outward(models.Model):
     bike_number = models.ForeignKey(bike_number, on_delete=models.CASCADE, unique = True)
     outward = models.ForeignKey(outward, on_delete=models.CASCADE, related_name="outward_related")
     battery_number = models.CharField(max_length=225)
+    price = models.IntegerField()
 
+                                                                                                                                                                                                                                                                                   
     
     def __str__(self):
         return self.bike_number.chasis_no
+

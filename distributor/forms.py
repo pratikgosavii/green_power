@@ -13,7 +13,7 @@ class distributor_outward_Form(forms.ModelForm):
     class Meta:
         model = distributor_outward
         fields = '__all__'
-        exclude = ['user', 'date']
+        exclude = ['user', 'date', 'inward']
         widgets = {
             
             
@@ -29,6 +29,15 @@ class distributor_outward_Form(forms.ModelForm):
 
 
         }
+
+
+
+class distributor_return_Form(forms.ModelForm):
+    class Meta:
+        model = distributor_return
+        fields = '__all__'
+        exclude = ['user', 'date']
+       
 
 
 

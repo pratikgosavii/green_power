@@ -40,6 +40,17 @@ class showroom_outward_Form(forms.ModelForm):
 
         }
 
+
+
+
+class showroom_return_Form(forms.ModelForm):
+    class Meta:
+        model = showroom_return
+        fields = '__all__'
+        exclude = ['user', 'date']
+       
+
+
 class showroom_request_Form(forms.ModelForm):
     class Meta:
         model = showroom_req

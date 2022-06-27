@@ -12,6 +12,7 @@ from django.http import FileResponse, Http404
 from django.http import FileResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse, HttpResponse, JsonResponse
+from pkg_resources import Distribution
 
 from stores.views import numOfDays
 # from transactions.filters import inward_filter, outward_filter, stock_filter
@@ -130,14 +131,14 @@ def accept_inward(request, inward_id):
 
             bike_data = bike_number.objects.get(chasis_no = i)
 
-            test = distributor_stock.objects.get(bike=bike_data.inward.bike)
+            test = distributor_stock.objects.get(bike=bike_data.inward.bike, user = request.user)
 
             test.total_bike = test.total_bike + 1
             test.save()
 
         except distributor_stock.DoesNotExist:
 
-            test = distributor_stock.objects.create(bike = bike_data.inward.bike, total_bike = 1)
+            test = distributor_stock.objects.create(bike = bike_data.inward.bike, total_bike = 1, user = request.user)
 
     data_inward.save()
             
@@ -219,8 +220,10 @@ def add_outward(request):
                 print(i)
                 print(bike_instance)
                 try:
+
+                    price_data = prices.objects.get(variant = bike_instance.inward.variant)
                     
-                    distributor_bike_number_outward.objects.create(bike_number = bike_instance, outward = instance)
+                    distributor_bike_number_outward.objects.create(bike_number = bike_instance, outward = instance, price = price_data.dealer_price)
                     print('----------')
                     print(bike_instance)
                     test = distributor_stock.objects.get(variant = bike_instance.inward.variant, color = bike_instance.color, user = request.user)
@@ -267,45 +270,53 @@ def add_outward(request):
 
     else:
 
-        forms = distributor_outward_Form()
+        
 
         distributor_data = distributor.objects.get(user=request.user)
-  
-        showroom_data = showroom.objects.filter(Distributor = distributor_data)
-
-        bike_numbers = []
 
         distributor_in_ = outward.objects.filter(distributor = distributor_data)
-        
+        bike_numbers = []
         for i in distributor_in_:
             bike_number_ = bike_number_outward.objects.filter(outward = i)
 
             for y in bike_number_:
                 bike_numbers.append(y.bike_number)
+  
 
-        match_inward_data = distributor_inward.objects.filter(user = request.user)
+        bike_numbers1 = distributor_outward.objects.filter(user = request.user)
 
-       
-        bike_numbers1 = distributor_bike_number_outward.objects.all()
+        bike_number_outward_list = []
 
-        bike_numbers = list(bike_numbers)
-        bike_numbers1 = list(bike_numbers1)
+        for i in bike_numbers1:
+            bike_number_ = distributor_bike_number_outward.objects.filter(outward = i)
+
+            for y in bike_number_:
+                bike_number_outward_list.append(y.bike_number)
+
 
         bike_numbers_final = bike_numbers.copy()
 
        
         for i in bike_numbers:
 
-            if i in bike_numbers1:
+            if i in bike_number_outward_list:
 
                 bike_numbers_final.remove(i)
 
+        forms = distributor_outward_Form()
+
+        showroom_data = showroom.objects.filter(Distributor = distributor_data)
+
+        
+
         context = {
-            'form': forms,
-            'showroom_data' : showroom_data,
+            'form' : forms,
             'bike_numbers' : bike_numbers_final,
+            'showroom_data' : showroom_data,
             
         }
+
+
         return render(request, 'distributor/add_outward.html', context)
 
 
@@ -320,15 +331,18 @@ def view_inward(request, inward_id):
     form = outward_Form(instance=outward)
     bike_data = []
 
-    for i in data:
-        chasis_no = i.bike_number
-        li_data = bike_number.objects.get(chasis_no = chasis_no)
-        bike_data.append(li_data.inward)
+    # for i in data:
+    #     chasis_no = i.bike_number
+    #     li_data = bike_number.objects.get(chasis_no = chasis_no)
+    #     bike_data.append(li_data.inward)
 
-    data1 = zip(bike_data, data)
+    data1 = data
+
+    return_data = distributor_bike_number_return.objects.filter(inward = instance)
     
     context = {
         'data': data1,
+        'return_data': return_data,
         'instance': instance,
         'form' : form,
         'bike_data' : bike_data
@@ -373,6 +387,269 @@ def list_outward(request):
 
     return render(request, 'distributor/list_outward.html', context)
 
+
+
+@distributor_required(login_url='login')
+def add_return(request):
+
+    if request.method == "POST":
+
+        print('i am here')
+        
+        chasis_no = request.POST.getlist('chasis_no[]')
+        set_chasis_no = set(chasis_no)
+
+        #checking in inward
+        match_inward_data = distributor_inward.objects.filter(user = request.user)
+
+        for i in match_inward_data:
+            match_data = bike_number_outward.objects.filter(outward = i.company_outward, bike_number__chasis_no__in=list(set_chasis_no))
+            
+            if match_data:
+                for i in match_data:
+                    i2 = i.bike_number.chasis_no
+                    set_chasis_no.remove(i2)
+        if set_chasis_no:
+            msgg = str(set_chasis_no) + ' not exist in inward'
+            return JsonResponse({'status' : msgg}, safe=False)
+         
+        #checking for outward
+        match_outward_data = distributor_outward.objects.filter(user = request.user)
+        print('match_outward_data')
+        outward_exist = []
+        print(match_outward_data)
+        for i in match_outward_data:
+            match_data = distributor_bike_number_outward.objects.filter(outward = i, bike_number__chasis_no__in=chasis_no)
+            print('---------------------')
+            print(match_data)
+            if match_data:
+                for z in match_data:
+                    outward_exist.append(z.bike_number.chasis_no)
+        
+        if outward_exist:
+            msgg = str(outward_exist) + ' already exist in outward you cant return it'
+            return JsonResponse({'status' : msgg}, safe=False)
+                
+        DC_date = request.POST.get('date')
+
+        if DC_date:
+
+            date_time = numOfDays(DC_date)
+        else:
+            date_time = datetime.now(IST)
+
+        bike_qty = len(chasis_no)
+    
+        print('here')
+
+        updated_request = request.POST.copy()
+        updated_request.update({'date': date_time, 'bike_qty' : bike_qty})
+        forms = distributor_return_Form(updated_request)
+
+        print('-----------')
+        if forms.is_valid():
+
+            instance = forms.save(commit=False)
+            instance.user = request.user
+            instance.save()
+
+            print('---------dfdfdf------------')
+
+            for i in chasis_no:
+
+                print('in for')
+                
+
+                bike_data = bike_number.objects.get(chasis_no = i)
+               
+               
+                bike_outward_update = bike_number_outward.objects.get(bike_number = bike_data)
+                
+                outward_comp = bike_outward_update.outward
+
+
+                dis_in = distributor_inward.objects.get(company_outward = outward_comp)
+
+                distributor_bike_number_return.objects.create(bike_number = bike_data, distributor_return = instance, inward = dis_in, price = bike_outward_update.price, company_outward = bike_outward_update.outward)
+
+                bike_outward_update.delete()
+                
+                
+
+
+                try:
+
+                    
+                    distributor_stock_instance = distributor_stock.objects.get(variant = bike_data.inward.variant, color = bike_data.color, user = request.user)
+                    print('distributor_stock_instance')
+                    print(distributor_stock_instance)
+                    print(distributor_stock_instance.total_bike)
+                    distributor_stock_instance.total_bike = distributor_stock_instance.total_bike - 1
+                    distributor_stock_instance.save()
+
+                    company_stock = stock.objects.get(variant = bike_data.inward.variant, color = bike_data.color)
+                    company_stock.total_bike = company_stock.total_bike + 1
+                    company_stock.save()
+
+                    print('done')
+
+                except Exception as e: 
+                    print('in except 1')
+                    print(e)
+
+                    
+
+            return JsonResponse({'status' : 'done'}, safe=False)
+
+    else:
+
+
+        distributor_data = distributor.objects.get(user=request.user)
+
+        distributor_in_ = outward.objects.filter(distributor = distributor_data)
+        bike_numbers = []
+        for i in distributor_in_:
+            bike_number_ = bike_number_outward.objects.filter(outward = i)
+
+            for y in bike_number_:
+                bike_numbers.append(y.bike_number)
+  
+
+        bike_numbers1 = distributor_outward.objects.filter(user = request.user)
+
+        bike_number_outward_list = []
+
+        for i in bike_numbers1:
+            bike_number_ = distributor_bike_number_outward.objects.filter(outward = i)
+
+            for y in bike_number_:
+                bike_number_outward_list.append(y.bike_number)
+
+
+        bike_numbers_final = bike_numbers.copy()
+
+       
+        for i in bike_numbers:
+
+            if i in bike_number_outward_list:
+
+                bike_numbers_final.remove(i)
+        print(bike_numbers)
+        context = {
+            'bike_numbers' : bike_numbers_final,
+            
+        }
+
+        return render(request, 'distributor/add_return.html', context)
+
+
+
+@distributor_required(login_url='login')
+def list_return(request):
+
+    data = distributor_return.objects.filter(user = request.user)
+
+
+
+    context = {
+        'data': data,
+        # 'filter_inward' : inward_filter_data
+    }
+
+
+    return render(request, 'distributor/list_return.html', context)
+
+
+
+@distributor_required(login_url='login')
+def view_return(request, return_id):
+
+    instance = distributor_return.objects.get(id = return_id)
+
+    data = distributor_bike_number_return.objects.filter(distributor_return = instance)
+
+    # outward_filter_data = outward_filter()
+
+
+
+    context = {
+        'data': data,
+        'instance' : instance
+        # 'filter_outward' : outward_filter_data
+    }
+
+    return render(request, 'distributor/view_distributor_return.html', context)
+    
+
+@distributor_required(login_url='login')
+def view_showroom_return(request, return_id):
+
+    instance = showroom_return.objects.get(id = return_id)
+
+    data = showroom_bike_number_return.objects.filter(distributor_return = instance)
+
+    # outward_filter_data = outward_filter()
+
+
+
+    context = {
+        'data': data,
+        'instance' : instance
+        # 'filter_outward' : outward_filter_data
+    }
+
+    return render(request, 'distributor/view_showroom_return.html', context)
+    
+
+
+
+@distributor_required(login_url='login')
+def list_showroom_return(request):
+
+    print('here')
+
+    distributor_instance = distributor.objects.get(user = request.user)
+
+    showroom_instance = showroom.objects.filter(Distributor = distributor_instance).values_list('user', flat = True)
+    
+
+    data = showroom_return.objects.filter(user__in = showroom_instance)
+
+
+
+    context = {
+        'data': data,
+        # 'filter_inward' : inward_filter_data
+    }
+
+
+    return render(request, 'distributor/list_showroom_return.html', context)
+
+
+
+@distributor_required(login_url='login')
+def detail_list_return(request):
+
+    data = []
+
+    check = distributor_return.objects.filter(user = request.user)
+
+    for i in check:
+
+        a = distributor_bike_number_return.objects.filter(distributor_return = i)
+        data.append(a)
+
+    data = list(chain.from_iterable(data))
+
+    print(data)
+
+
+    context = {
+        'data': data,
+        # 'filter_inward' : inward_filter_data
+    }
+
+    return render(request, 'distributor/detail_list_return.html', context)
 
 
 @distributor_required(login_url='login')
@@ -493,11 +770,15 @@ def update_outward(request, outward_id):
     showroom_id = instance.showroom.id
 
 
+    return_data  = showroom_bike_number_return.objects.filter(outward_distributor = instance)
+
+
     context = {
         'form': forms,
         'data':data,
         'instance':instance,
         'showroom_data' : showroom_data,
+        'return_data' : return_data,
         'showroom_id' : showroom_id
     }
     return render(request, 'distributor/update_outward.html', context)
@@ -509,49 +790,52 @@ def delete_outward(request, outward_id):
 
     print('in delte')
     try:
-        con = distributor_outward.objects.filter(id = outward_id).first()
+        con = distributor_outward.objects.get(id = outward_id)
         print('1')
         print(con)
     except distributor_outward.DoesNotExist:
 
         print('something went wrong')
-        return HttpResponseRedirect(reverse('distributor_list_outward'))
+        return redirect('distributor_list_outward')
     
     if con:
 
 
-        data = distributor_bike_number_outward.objects.filter(outward = con)
+        data = distributor_bike_number_outward.objects.filter(outward = con).values_list('bike_number__chasis_no', flat = True)
+        distributor_instance = distributor.objects.get(user = request.user)
+        showroom_instance = showroom.objects.get(Distributor = distributor_instance)
 
-        for y in data:
-                    
-            try:
-                data1 = bike_number_outward.objects.get(bike_number = y.bike_number)
-            except bike_number_outward.DoesNotExist:
-                data1 = None
-                pass
-            
+        a = showroom_outward.objects.filter(user = showroom_instance.user)
 
-            if data1:
+        for i in a:
 
-                a = showroom_bike_number_outward.objects.all()
+            show_bike = showroom_bike_number_outward.objects.filter(outward = i).values_list('bike_number__chasis_no', flat = True)
+            print('here it is')
+            print(data)
+            print(show_bike)
+            print('here it is')
 
-                for y in a:
+            show_bike
 
-                    if y.bike_number.chasis_no in data1.bike_number.chasis_no:
 
-                        msg  = "Cant delete Outward, bike is already in outward of distributor hn"
 
-                        data = distributor_outward.objects.filter(user = request.user)
+            if any(item in show_bike for item in data):
 
-                        context = {
-                            'data': data,
-                            'msg': msg,
-                            # 'filter_outward' : outward_filter_data
-                        }
 
-                        return render(request, 'distributor/list_outward.html', context)
 
-                     
+                msg  = "Cant delete Outward, bike is already in outward of distributor hn"
+
+                data = distributor_outward.objects.filter(user = request.user)
+
+                context = {
+                    'data': data,
+                    'msg': msg,
+                    # 'filter_outward' : outward_filter_data
+                }
+
+                return render(request, 'distributor/list_outward.html', context)
+
+        
 
         try:
 
@@ -560,19 +844,19 @@ def delete_outward(request, outward_id):
             print(con1)
             for z in con1:
 
-                test = distributor_stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color)
+                test = distributor_stock.objects.get(variant = z.bike_number.inward.variant, color = z.bike_number.color, user = request.user)
                 test.total_bike = test.total_bike + 1
                 test.save()
             con.delete()
             con1.delete()
 
-            return HttpResponseRedirect(reverse('distributor_list_outward'))
+            return redirect('distributor_list_outward')
 
 
         except distributor_stock.DoesNotExist:
 
             print('something went wrong')
-            return HttpResponseRedirect(reverse('distributor_list_outward'))
+            return redirect('distributor_list_outward')
 
 
 

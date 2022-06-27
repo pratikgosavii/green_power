@@ -22,6 +22,12 @@ urlpatterns = [
     path('delete-outward/<outward_id>', delete_outward, name='distributor_delete_outward'),
     path('list-outward/', list_outward, name='distributor_list_outward'),
     
+    path('add-return/', add_return, name='add_return'),
+    path('list-return/', list_return, name='list_return'),
+    path('view-return/<return_id>', view_return, name='view_return'),
+    path('list-showroom-return/', list_showroom_return, name='list_showroom_return'),
+    path('view-showroom-return/', view_showroom_return, name='view_showroom_return'),
+    
     path('add-request/', add_request, name='distributor_add_request'),
     path('update-request/<request_id>', update_request, name='distributor_update_request'),
     path('list-request', list_request, name='distributor_list_request'),
@@ -31,8 +37,10 @@ urlpatterns = [
     path('distributor-send-payment-detials-pr/<request_id>', distributor_send_payment_detials, name='distributor_send_payment_detials'),
     path('distributor-update-payment-detialsr/<payment_id>', distributor_update_payment_detials, name='distributor_update_payment_detials'),
 
+
     path('detail-list-inward/', detail_list_inward, name='distributor_detail_list_inward'),
     path('detail-list-outward/', detail_list_outward, name='distributor_detail_list_outward'),
+    path('detail-list-return/', detail_list_return, name='distributor_detail_list_return'),
 
     path('list-stock/', list_stock, name='distributor_list_stock'),
     

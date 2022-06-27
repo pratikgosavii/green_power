@@ -26,7 +26,16 @@ urlpatterns = [
     path('update-outward/<outward_id>', update_outward, name='update_outward'),
     path('delete-outward/<outward_id>', delete_outward, name='delete_outward'),
     path('list-outward/', list_outward, name='list_outward'),
+    
+    path('list-return-distributor/', admin_list_return_distributor, name='admin_list_return_distributor'),
+    path('view-return-distributor/<distributor_return_id>', view_admin_list_return_distributor, name='view_admin_list_return_distributor'),
+    path('list-return-showroom/', admin_list_return_showroom, name='admin_list_return_showroom'),
+    path('view-return-showroom/', admin_list_return_showroom, name='admin_list_return_showroom'),
  
+
+    
+
+
     path('list-stock/', list_stock, name='list_stock'),
 
    
@@ -40,6 +49,11 @@ urlpatterns = [
 
     
     path('bill-generate-outward/<outward_id>', bill_generate_outward, name='bill_generate_outward'),
+
+
+
+
+    path('generate-gstr1', generate_gstr1, name='generate_gstr1'),
 
 
 

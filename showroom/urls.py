@@ -31,6 +31,11 @@ urlpatterns = [
     path('delete-outward/<outward_id>', delete_outward, name='showroom_delete_outward'),
     path('list-outward/', list_outward, name='showroom_list_outward'),
 
+    
+    path('add-return/', add_return, name='showroom_add_return'),
+    path('list-return/', list_return, name='showroom_list_return'),
+    path('view-return/', view_return, name='view_showroom_list_return'),
+
     path('add-request/', add_request, name='showroom_add_request'),
     path('update-request/<request_id>', update_request, name='showroom_update_request'),
     path('details-request/<request_id>', details_request, name='showroom_details_request'),

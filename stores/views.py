@@ -124,7 +124,7 @@ def delete_variant(request, variant_id):
 
     variant.objects.get(id=variant_id).delete()
 
-    return HttpResponseRedirect(reverse('list_variant'))
+    return redirect('list_variant')
 
 
         
@@ -212,7 +212,7 @@ def delete_bike_color(request, color_id):
 
     Color.objects.get(id=color_id).delete()
 
-    return HttpResponseRedirect(reverse('list_bike_color'))
+    return redirect('list_bike_color')
 
 
         
@@ -340,7 +340,7 @@ def delete_showroom(request, showroom_id):
     
     showroom.objects.get(id=showroom_id).delete()
 
-    return HttpResponseRedirect(reverse('list_showroom'))
+    return redirect('list_showroom')
 
 @admin_required(login_url="login")
 def list_showroom(request):
@@ -458,7 +458,7 @@ def delete_distributor(request, distributor_id):
     
     distributor.objects.get(id=distributor_id).delete()
 
-    return HttpResponseRedirect(reverse('list_distributor'))
+    return redirect('list_distributor')
 
 @admin_required(login_url="login")
 def list_distributor(request):

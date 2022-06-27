@@ -38,6 +38,7 @@ def admin_required(login_url=None):
 from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, TableStyle
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch,cm,mm
 from reportlab.pdfgen.canvas import Canvas
@@ -219,7 +220,7 @@ def delete_inward(request, inward_id):
     except inward.DoesNotExist:
 
         print('something went wrong')
-        return HttpResponseRedirect(reverse('list_inward'))
+        return redirect('list_inward')
 
     if con:
 
@@ -261,14 +262,14 @@ def delete_inward(request, inward_id):
             con.delete()
             con1.delete()
 
-            return HttpResponseRedirect(reverse('list_inward'))
+            return redirect('list_inward')
 
 
 
         except stock.DoesNotExist:
 
             print('something went wrong2')
-            return HttpResponseRedirect(reverse('list_inward'))
+            return redirect('list_inward')
 
 @admin_required(login_url="login")
 def list_inward(request):
@@ -888,10 +889,6 @@ def add_outward(request):
         chasis_no = request.POST.getlist('chasis_no[]')
         set_chasis_no = set(chasis_no)
 
-        #checking in inward
-        bike_number_data = bike_number.objects.all()
-        check_condition = None
-
         match_data = bike_number.objects.filter(chasis_no__in=chasis_no)
         print(match_data)
 
@@ -927,15 +924,7 @@ def add_outward(request):
 
         bike_qty = len(chasis_no)
 
-        for i in chasis_no:
-        
-            inward_data = bike_number.objects.filter(chasis_no = i)
-
-            if not inward_data:
-
-                return JsonResponse({'status' : 'Chasis No not found in inward'}, safe=False)
-
-            
+       
         showroom_data = request.POST.get('showroom')
         distributor_data = request.POST.get('distributor')
         print('distributor_data')
@@ -981,28 +970,31 @@ def add_outward(request):
 
                     bike_data = bike_number.objects.get(chasis_no = i)
 
+                    price_data = prices.objects.get(variant = bike_data.inward.variant)
+
                     print('bike data')
                     print(bike_data)
 
+                   
+                    
+
+                   
+                    bike_number_outward.objects.create(bike_number = bike_data, outward = instance, price = price_data.distributor_price)
+                  
+
                     try: 
+                        test = distributor_stock.objects.get(variant=bike_data.inward.variant, color = bike_data.color, user = user_data)
 
-                        bike_number_outward.objects.create(bike_number = bike_data, outward = instance)
+                        test.total_bike = test.total_bike + 1
+                        test.save()
 
-                        try:
-                            test = distributor_stock.objects.get(variant=bike_data.inward.variant, color = bike_data.color, user = user_data)
-
-                            test.total_bike = test.total_bike + 1
-                            test.save()
-                        
-                        except distributor_stock.DoesNotExist:
-                            distributor_stock.objects.create(variant=bike_data.inward.variant, color = bike_data.color, total_bike = 1, user = user_data)
+                        print('1')
+                    
+                    except distributor_stock.DoesNotExist:
+                        distributor_stock.objects.create(variant=bike_data.inward.variant, color = bike_data.color, total_bike = 1, user = user_data)
 
 
-                    except IntegrityError as e: 
-
-                        instance.delete()
-                        
-                        return JsonResponse({'other_error' : 'Unique contraint fail'}, safe=False)
+                
 
                 return JsonResponse({'status' : 'done'}, safe=False)
 
@@ -1019,39 +1011,39 @@ def add_outward(request):
                     print('in in for')
 
                     bike_data = bike_number.objects.get(chasis_no = i)
+                    price_data = prices.objects.get(variant = bike_data.inward.variant)
 
                     print('bike_Data')
                     print(bike_data)
 
+
+                    bike_number_outward.objects.create(bike_number = bike_data, outward = instance, price = price_data.dealer_price)
+
+                
                     try: 
-                        a = bike_number_outward.objects.create(bike_number = bike_data, outward = instance)
+
+
+
+                        print('in try')
+                        test = showroom_stock.objects.get(variant=bike_data.inward.variant, color = bike_data.color, user = user_data)
+
+                        test.total_bike = test.total_bike + 1
+                        test.save()
+
+                        print('in try')
+
+                    except showroom_stock.DoesNotExist:
+                        print('in except')
+                        a = showroom_stock.objects.create(variant=bike_data.inward.variant, color = bike_data.color, total_bike = 1, user = user_data)
+                        print('created')
                         print(a)
+                        return JsonResponse({'status' : 'done'}, safe=False)
 
-                        try: 
-
-
-
-                            print('in try')
-                            test = showroom_stock.objects.get(variant=bike_data.inward.variant, color = bike_data.color, user = user_data)
-
-                            test.total_bike = test.total_bike + 1
-                            test.save()
-
-                            print('in try')
-
-                        except showroom_stock.DoesNotExist:
-                            print('in except')
-                            a = showroom_stock.objects.create(variant=bike_data.inward.variant, color = bike_data.color, total_bike = 1, user = user_data)
-                            print('created')
-                            print(a)
-                            return JsonResponse({'status' : 'done'}, safe=False)
+                
+                        
 
 
-                            
-                    except IntegrityError as e: 
-                        print('hereee')
-                        instance.delete()
-                        return JsonResponse({'other_error' : 'Unique contraint fail'}, safe=False)
+
                 return JsonResponse({'status' : 'done'}, safe=False)
         else:
             
@@ -1142,22 +1134,88 @@ def list_outward(request):
 
     return render(request, 'transactions/list_outward.html', context)
     
+
+@admin_required(login_url="login")
+def admin_list_return_distributor(request):
+
+    data = distributor_return.objects.all()
+
+    # outward_filter_data = outward_filter()
+
+
+
+    context = {
+        'data': data,
+        # 'filter_outward' : outward_filter_data
+    }
+
+    return render(request, 'transactions/list_return.html', context)
+    
+
+@admin_required(login_url="login")
+def view_admin_list_return_distributor(request, distributor_return_id):
+
+    instance = distributor_return.objects.get(id = distributor_return_id)
+
+    data = distributor_bike_number_return.objects.filter(distributor_return = instance)
+
+    # outward_filter_data = outward_filter()
+
+
+
+    context = {
+        'data': data,
+        'instance' : instance
+        # 'filter_outward' : outward_filter_data
+    }
+
+    return render(request, 'transactions/view_distributor_return.html', context)
+    
+
+@admin_required(login_url="login")
+def admin_list_return_showroom(request):
+
+    data = showroom_bike_number_return.objects.filter(inward__company_outward__isnull = False)
+
+    
+    # outward_filter_data = outward_filter()
+
+
+
+    context = {
+        'data': data,
+        # 'filter_outward' : outward_filter_data
+    }
+
+    return render(request, 'transactions/list_return_showroom.html', context)
+    
+
 @admin_required(login_url="login")
 def update_outward(request, outward_id):
 
 
 
     instance = outward.objects.get(id = outward_id)
+
+
     
     data = bike_number_outward.objects.filter(outward = instance)
+
 
     forms = outward_Form(instance = instance)
 
     showroom_data = showroom.objects.filter(Distributor=None)
     
     if instance.showroom:
+
+        return_data = showroom_bike_number_return.objects.filter(outward_company = instance)
+
         showroom_id = instance.showroom.id
+
     else:
+
+        return_data = distributor_bike_number_return.objects.filter(company_outward = instance)
+
         showroom_id = None
 
     context = {
@@ -1165,6 +1223,7 @@ def update_outward(request, outward_id):
         'data':data,
         'showroom_data' : showroom_data,
         'showroom_id' : showroom_id,
+        'return_data' : return_data,
         'instance' : instance
     }
     return render(request, 'transactions/update_outward.html', context)
@@ -1179,7 +1238,7 @@ def delete_outward(request, outward_id):
     except outward.DoesNotExist:
 
         print('something went wrong')
-        return HttpResponseRedirect(reverse('list_outward'))
+        return redirect('list_outward')
 
 
     if con:
@@ -1187,38 +1246,38 @@ def delete_outward(request, outward_id):
         if con.distributor:
 
 
-            data = bike_number_outward.objects.filter(outward = con)
+            data = bike_number_outward.objects.filter(outward = con).values_list('bike_number__chasis_no', flat=True)
 
-            for y in data:
-                        
-                try:
-                    data1 = bike_number_outward.objects.get(bike_number = y.bike_number)
-                except bike_number_outward.DoesNotExist:
-                    data1 = None
-                    pass
-                
+            a = distributor_bike_number_outward.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
 
-                if data1:
+            if a:
 
+                msg  = ', '.join(a) + " Already sold by Distributor"
 
-                    a = distributor_bike_number_outward.objects.all()
+                data = outward.objects.all()
 
-                    for y in a:
+                context = {
+                    'data': data,
+                    'msg': msg,
+                }
 
-                        if y.bike_number.chasis_no in data1.bike_number.chasis_no:
+                return render(request, 'transactions/list_outward.html', context)
+                                    
+            b = distributor_bike_number_return.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
+            
+            if b:
 
-                            msg  = "Cant delete Outward, bike is already in outward of distributor hn"
+                msg  = ', '.join(b) + " Already Return to you by Distributor"
 
-                            data = outward.objects.all()
+                data = outward.objects.all()
 
-                            context = {
-                                'data': data,
-                                'msg': msg,
-                            }
+                context = {
+                    'data': data,
+                    'msg': msg,
+                }
 
-                            return render(request, 'transactions/list_outward.html', context)
-                                
-
+                return render(request, 'transactions/list_outward.html', context)
+            
 
             try:
 
@@ -1236,51 +1295,49 @@ def delete_outward(request, outward_id):
                 con.delete()
                 con1.delete()
 
-                return HttpResponseRedirect(reverse('list_outward'))
+                return redirect('list_outward')
 
 
 
             except stock.DoesNotExist:
 
                 print('something went wrong2')
-                return HttpResponseRedirect(reverse('list_outward'))
+                return redirect('list_outward')
 
         else:
 
             
+            data = bike_number_outward.objects.filter(outward = con).values_list('bike_number__chasis_no', flat=True)
 
-            data = bike_number_outward.objects.filter(outward = con)
+            a = showroom_bike_number_outward.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
 
-            for y in data:
-                        
-                try:
-                    data1 = bike_number_outward.objects.get(bike_number = y.bike_number)
-                except bike_number_outward.DoesNotExist:
-                    data1 = None
-                    pass
-                
+            if a:
 
-                if data1:
+                msg  = ', '.join(a) + " Already sold by Showroom"
 
+                data = outward.objects.all()
 
-                    a = showroom_bike_number_outward.objects.all()
+                context = {
+                    'data': data,
+                    'msg': msg,
+                }
 
-                    for y in a:
+                return render(request, 'transactions/list_outward.html', context)
+                                    
+            b = showroom_bike_number_return.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
+            
+            if b:
 
-                        if y.bike_number.chasis_no in data1.bike_number.chasis_no:
+                msg  = ', '.join(b) + " Already Return to you by Showroom"
 
-                            msg  = "Cant delete Outward, bike is already in outward of distributor hn"
+                data = outward.objects.all()
 
-                            data = outward.objects.all()
+                context = {
+                    'data': data,
+                    'msg': msg,
+                }
 
-                            context = {
-                                'data': data,
-                                'msg': msg,
-                            }
-
-                            return render(request, 'transactions/list_outward.html', context)
-                                
-
+                return render(request, 'transactions/list_outward.html', context)
 
             try:
 
@@ -1298,14 +1355,17 @@ def delete_outward(request, outward_id):
                 con.delete()
                 con1.delete()
 
-                return HttpResponseRedirect(reverse('list_outward'))
+                return redirect('list_outward')
 
 
 
             except stock.DoesNotExist:
 
                 print('something went wrong2')
-                return HttpResponseRedirect(reverse('list_outward'))
+                return redirect('list_outward')
+
+
+
 
 
 
@@ -1342,12 +1402,14 @@ def bill_generate_outward(request, outward_id):
         print(bike_number_outward_data)
         all_price = []
 
-        if outward_data.distributor:
+        for i in bike_number_outward_data:
 
-            print('in outward')
+            if outward_data.distributor:
 
+                print('in outward')
+
+                
             
-            for i in bike_number_outward_data:
                 
                 variant1 = i.bike_number.inward.variant
                 p = prices.objects.get(variant = variant1)
@@ -1358,21 +1420,21 @@ def bill_generate_outward(request, outward_id):
                 mobile_no = outward_data.distributor.mobile_number
                 taker_name = outward_data.distributor.name
                 gst = outward_data.distributor.GSTIN_no
+                    
+            else:
+
+                print('in inward')
+
+                variant1 = i.bike_number.inward.variant
+                p = prices.objects.get(variant = variant1)
+                all_price.append(p.dealer_price)
                 
-        else:
-
-            print('in inward')
-
-            variant1 = i.bike_number.inward.variant
-            p = prices.objects.get(variant = variant1)
-            all_price.append(p.dealer_price)
-            
-            total_price = sum(all_price)
-            grand_total_price = ((total_price / 100) * 5) + total_price
-            address = outward_data.showroom.address
-            mobile_no = outward_data.showroom.mobile_number
-            taker_name = outward_data.showroom.name
-            gst = outward_data.showroom.GSTIN_no
+                total_price = sum(all_price)
+                grand_total_price = ((total_price / 100) * 5) + total_price
+                address = outward_data.showroom.address
+                mobile_no = outward_data.showroom.mobile_number
+                taker_name = outward_data.showroom.name
+                gst = outward_data.showroom.GSTIN_no
 
 
         print(all_price)
@@ -1788,20 +1850,24 @@ def bill_generate_outward(request, outward_id):
     else:
 
         outward_data = outward.objects.get(id=outward_id)
-        bike_detials = bike_number_outward.objects.get(outward = outward_data)
+        try:
+            bike_detials = bike_number_outward.objects.get(outward = outward_data)
+        except:
+            bike_detials = distributor_bike_number_return.objects.get(company_outward = outward_data)
+
 
         all_price = []
 
         if outward_data.distributor:
+
 
             print('in outward')
 
             variant1 = bike_detials.bike_number.inward.variant
             hsc = variant.hsn_sac
             p = prices.objects.get(variant = variant1)
-            all_price.append(p.distributor_price)
             
-            total_price = sum(all_price)
+            total_price = p.distributor_price
             grand_total_price = ((total_price / 100) * 5) + total_price
             inword_price = number_to_word(total_price)
             address = outward_data.distributor.address
@@ -1813,9 +1879,8 @@ def bill_generate_outward(request, outward_id):
             variant1 = i.bike_number.inward.variant
             hsc = variant.hsn_sac
             p = prices.objects.get(variant = variant1)
-            all_price.append(p.dealer_price)
             
-            total_price = sum(all_price)
+            total_price = p.dealer_price
             grand_total_price = ((total_price / 100) * 5) + total_price
             address = outward_data.dealer.address
             mobile_no = outward_data.dealer.mobile_number
@@ -2166,3 +2231,377 @@ def bill_generate_outward(request, outward_id):
 
         return response
 
+
+
+from reportlab.lib.pagesizes import letter, landscape
+
+
+
+
+
+
+
+
+def generate_gstr1(request):
+
+
+    no_of_records = 0
+    total_invoice_amount = 0
+    total_taxable_amount = 0
+    total_tax_libility = 0
+    total_CGST_amount = 0
+    total_SGST_amount = 0
+    total_IGST_amount = 0
+    total_CESS = 0
+    
+    return_data_no_of_records = 0
+    return_data_total_invoice_amount = 0
+    return_data_total_taxable_amount = 0
+    return_data_total_tax_libility = 0
+    return_data_total_CGST_amount = 0
+    return_data_total_SGST_amount = 0
+    return_data_total_IGST_amount = 0
+    return_data_total_CESS = 0
+
+
+
+    data = outward.objects.filter(date__range=["2022-06-01", "2022-06-30"])
+
+    no_of_records =  data.count()
+
+    bike_details = bike_number_outward.objects.filter(outward__in = data).values_list('price', flat = True)
+   
+
+
+    total_invoice_amount = sum(bike_details)
+        
+    print(bike_details)
+
+    total_taxable_amount = total_invoice_amount - ((total_invoice_amount / 100) * 5)
+
+    total_CGST_amount = ((total_invoice_amount / 100) * 5) / 2
+
+    total_SGST_amount = total_CGST_amount
+
+    # calcultions for return bike
+
+    return_data = distributor_return.objects.filter(date__range=["2022-06-01", "2022-06-30"])
+    return_data_no_of_records =  return_data.count()
+    return_bike_details = distributor_bike_number_return.objects.filter(distributor_return__in = return_data).values_list('price', flat = True)
+    print('return_bike_details') 
+    print(return_bike_details) 
+    return_data_total_invoice_amount = sum(return_bike_details)
+
+    return_data_total_taxable_amount = return_data_total_invoice_amount - ((return_data_total_invoice_amount / 100) * 5)
+
+    return_data_total_CGST_amount = ((return_data_total_invoice_amount / 100) * 5) / 2
+
+    return_data_total_SGST_amount = return_data_total_CGST_amount
+
+
+        
+    
+
+    path = os.path.join(BASE_DIR) + '\media\\' + 'GSTR1_report.pdf'
+    
+    pdf = SimpleDocTemplate(path)
+    
+    # standard stylesheet defined within reportlab itself
+    pdf.pagesize = landscape(A4)
+    styles = getSampleStyleSheet()
+    # fetching the style of Top level heading (Heading1)
+    title_style = styles[ "Heading1" ]
+    
+    # 0: left, 1: center, 2: right
+    title_style.alignment = 1
+
+
+    title = Paragraph( "PR" , title_style )
+            
+    frame1 = Frame(0.5 * inch, 0.5 * inch, 10 * inch, 7.5 * inch,
+                    leftPadding=0, rightPadding=0,
+                    topPadding=0, bottomPadding=0,)
+
+    flow_obj = []
+
+    flow_obj.append(title)
+
+
+
+    style = TableStyle(
+        [
+            
+            ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+            ( "GRID" , (0, 0), (-1, -1 ), 0, colors.black ),
+            ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+            ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTER" ),
+            ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+            ('FONTNAME', (0,0), (-1, 0), 'Times-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+
+
+        ]
+    )
+
+    style1 = TableStyle(
+        [
+            
+            ( "BOX" , ( 0, 0 ), ( -1, -1 ), 0 , colors.black ),
+            ( "GRID" , (0, 0), (-1, -1 ), 0, colors.black ),
+            ( "TEXTCOLOR" , ( 0, 0 ), ( -1, 0 ), colors.black ),
+            ( "ALIGN" , ( 0, 0 ), ( -1, -1 ), "CENTER" ),
+            ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+
+
+        ]
+    )
+    
+    
+
+
+    DATA = [[ "Section Name" , "No. of Record", "Total Invoice Amt", "Total Taxable Amt", "Total Tax Liability", "Total CGST Amt", "Total SGST Amt", "Total IGST Amt", "Total CESS" ]]
+
+
+
+    DATA3 = [
+        [
+            "B2B Invoices 4A, 4B, 4C, 6B, 6C.",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "B2C(Large) Invoices 5A, 58",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "B2C(Small) Details 7",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Credit/Debit Notes(Registered)-98",
+
+            return_data_no_of_records,
+            return_data_total_invoice_amount,
+            return_data_total_taxable_amount,
+            return_data_total_tax_libility,
+            return_data_total_CGST_amount,
+            return_data_total_SGST_amount, 
+            return_data_total_IGST_amount,
+            return_data_total_CESS
+            
+            
+        ],
+        [
+            "Credit/Debit Notes(Unegistered)-98",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Exports Invoices-6A",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Tax Liability(Advances Recieved)-11A(1), 11A(2)",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Adjustment of Advances - 118(1), 118(2)",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Nil rated, Exempted and Non GST (8)",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Total Nil Amt.                  :",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Total Exempted Amt.              :",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Total Non-GST Amt.                 :",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "HSN-wise Summary of Outward Supplies - 12",
+            10000000,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Summary of documents issued during the tax period (13)",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Total Docs",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Cancelled Docs",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+        [
+            "Net Issued Docs",
+            no_of_records,
+            total_invoice_amount,
+            total_taxable_amount,
+            total_tax_libility,
+            total_CGST_amount,
+            total_SGST_amount, 
+            total_IGST_amount,
+            total_CESS
+            
+            
+        ],
+    ]
+
+
+    table1 = Table( DATA , style = style, colWidths=(7*cm, 2.3*cm, 2.3*cm, 2.3*cm,2.3*cm,2.3*cm,2.3*cm,2.3*cm,2.3*cm))
+    table2 = Table( DATA3 , style = style1, colWidths=(7*cm, 2.3*cm, 2.3*cm, 2.3*cm,2.3*cm,2.3*cm,2.3*cm,2.3*cm,2.3*cm))
+
+    flow_obj.append(table1)
+    flow_obj.append(table2)
+
+
+    pdf1 = canvas.Canvas(path)
+    pdf1.setPageSize( landscape(A4) )
+    frame1.addFromList(flow_obj, pdf1)
+
+    
+
+    # building pdf
+    pdf1.save()

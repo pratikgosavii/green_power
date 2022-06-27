@@ -49,6 +49,28 @@ class distributor_bike_number_outward(models.Model):
 
     bike_number = models.ForeignKey(bike_number, on_delete=models.CASCADE, unique=True)
     outward = models.ForeignKey(distributor_outward, on_delete=models.CASCADE, related_name="related")
+    price = models.IntegerField()
+
+    # battery_number = models.CharField(max_length=225)
+    def __str__(self):
+        return self.bike_number.chasis_no
+
+
+class distributor_return(models.Model):
+    
+    date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bike_qty = models.IntegerField()
+
+
+class distributor_bike_number_return(models.Model):
+
+    bike_number = models.ForeignKey(bike_number, on_delete=models.CASCADE)
+    distributor_return = models.ForeignKey(distributor_return, on_delete=models.CASCADE, related_name="related")
+    inward = models.ForeignKey(distributor_inward , on_delete=models.CASCADE)
+    company_outward = models.ForeignKey(outward , on_delete=models.CASCADE)
+    price = models.IntegerField()
+    
     # battery_number = models.CharField(max_length=225)
     def __str__(self):
         return self.bike_number.chasis_no

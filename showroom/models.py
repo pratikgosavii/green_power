@@ -87,10 +87,37 @@ class showroom_bike_number_outward(models.Model):
         return self.bike_number.chasis_no
 
 
+
+
+class showroom_return(models.Model):
+    
+    date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bike_qty = models.IntegerField()
+
+
+class showroom_bike_number_return(models.Model):
+
+    bike_number = models.ForeignKey(bike_number, on_delete=models.CASCADE, related_name='sdsdsdwwwd')
+    showroom_return = models.ForeignKey(showroom_return, on_delete=models.CASCADE, related_name="sdsdwfefsd")
+    inward = models.ForeignKey(showroom_inward , on_delete=models.CASCADE)
+    outward_company = models.ForeignKey(outward , on_delete=models.CASCADE, blank =True, null=True)
+    outward_distributor = models.ForeignKey(distributor_outward , on_delete=models.CASCADE, blank = True, null=True)
+    price = models.IntegerField()
+
+    
+    # battery_number = models.CharField(max_length=225)
+    def __str__(self):
+        return self.bike_number.chasis_no
+
+
+
 class showroom_stock(models.Model):
 
     variant =  models.ForeignKey(variant, on_delete=models.CASCADE)
     color =  models.ForeignKey(Color, on_delete=models.CASCADE)
     user =  models.ForeignKey(User, on_delete=models.CASCADE)
     total_bike = models.IntegerField()
+
+
 
