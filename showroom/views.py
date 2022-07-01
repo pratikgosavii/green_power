@@ -841,12 +841,9 @@ def add_request(request):
 
     if request.method == 'POST':
 
-        variant_get = request.POST.getlist("variant[]")
-        color = request.POST.getlist("color[]")
+        stock_instances = []
+        stock_id = request.POST.getlist("variant[]")
         bike_qty = request.POST.getlist("bike_qty[]")
-
-        print(variant_get)
-        print(color)
 
         showroom_data = showroom.objects.get(user = request.user)
         distributor_data = showroom_data.Distributor
@@ -861,10 +858,10 @@ def add_request(request):
 
         print(request.POST)
 
-        for a,b,c in zip(variant_get, color, bike_qty):
+        for a ,c in zip(stock_instances, bike_qty):
 
-            variant_data = variant.objects.get(name = a)
-            color_data = Color.objects.get(name = b)
+            variant_data = variant.objects.get(name = a.variant)
+            color_data = Color.objects.get(name = a.color)
 
             
             updated_request.update({'variant': variant_data, 'color' : color_data, 'bike_qty' : c, 'showroom_request' : instance})

@@ -125,13 +125,9 @@
 
             
 
-            variant = variant + '<option value= "{{ i.variant.name}}"> {{ i.variant.name }} </option>'
+            variant = variant + '<option value= "{{ i.id }}"> {{ i.variant.name }} &nbsp; color:- {{ i.color.name }}</option>'
 
-        {% endfor %}
 
-        {% for i in data %}
-
-            color = color + '<option value= "{{ i.color.name }}"> {{ i.color.name }} </option>'
 
         {% endfor %}
         
@@ -152,15 +148,7 @@
 
                 </div>
 
-                <div class="form-group">
-                    <label for="name" class="control-label mb-1">Color</label>
-                    <select name="color" class="form-control" id="bike" required="">
-                    <option value="" selected="">---------</option>
-                    `+ color + `
-                    </select>
-                    <small class="text-danger">  </small>
-
-                </div>
+               
 
                 <div class="form-group">
                     <label for="name" class="control-label mb-1">Bike Qty</label>
@@ -197,12 +185,10 @@
         e.preventDefault();
 
         variant = document.getElementsByName("variant");
-        color = document.getElementsByName("color");
         bike_qty = document.getElementsByName("bike_qty");
     
 
         variant_arr = []
-        color_arr = []
         bike_qty_arr = []
 
         
@@ -213,7 +199,6 @@
             } 
            
             variant_arr.push(variant[i].value);
-            color_arr.push(color[i].value);
             bike_qty_arr.push(bike_qty[i].value);
 
         }
@@ -222,7 +207,6 @@
         let form_data = {
             csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
             variant : variant_arr,
-            color : color_arr,
             bike_qty : bike_qty_arr,
           }
 

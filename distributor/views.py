@@ -892,18 +892,25 @@ def add_request(request):
     if request.method == 'POST':
 
       
-        variant_get = request.POST.getlist("variant[]")
-        color = request.POST.getlist("color[]")
+        stock_instances = []
+        stock_id = request.POST.getlist("variant[]")
+        
+        for i in stock_id:
+            stock_instances.append(stock.objects.get(id = i))
+
+        for i in stock_instances:
+            print(i)
         bike_qty = request.POST.getlist("bike_qty[]")
 
+       
         distributor_data = distributor.objects.get(user = request.user)
 
         instance = distributor_request.objects.create(distributor = distributor_data)
 
-        for a,b,c in zip(variant_get, color, bike_qty):
+        for a ,c in zip(stock_instances , bike_qty):
 
-            variant_data = variant.objects.get(name = a)
-            color_data = Color.objects.get(name = b)
+            variant_data = variant.objects.get(name = a.variant)
+            color_data = Color.objects.get(name = a.color)
 
             updated_request = request.POST.copy()
             updated_request.update({'variant': variant_data, 'color' : color_data, 'bike_qty' : c, 'bike_qty' : c, 'distributor_request' : instance})
@@ -934,12 +941,11 @@ def add_request(request):
         forms = distributor_request_Form()
 
         stock_data = stock.objects.all()
+        print('stock_data')
+        print(stock_data)
 
         list1 = []
-        list2 = []
-        list3 = []
-        main_list = []
-
+      
         for i in stock_data:
 
             if i.total_bike > 0:

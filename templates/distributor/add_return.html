@@ -307,7 +307,7 @@
         //window.location.href = http + "{% url 'list_inward' %}"
         alert(data.status);
         if (data.status == "done") {
-          window.location.href = "{% url 'list_outward' %}";
+          window.location.href = "{% url 'list_return' %}";
         } else if (data.error !== undefined) {
           alert("here");
           var a = JSON.parse(data.error);
