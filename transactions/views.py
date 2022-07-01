@@ -1188,7 +1188,31 @@ def admin_list_return_showroom(request):
     }
 
     return render(request, 'transactions/list_return_showroom.html', context)
+
+
+
+  
+
+@admin_required(login_url='login')
+def admin_view_return_showroom(request, return_id):
+
+    instance = showroom_return.objects.get(id = return_id)
+
+    data = showroom_bike_number_return.objects.filter(showroom_return = instance)
+
+    # outward_filter_data = outward_filter()
+
+
+
+    context = {
+        'data': data,
+        'instance' : instance
+        # 'filter_outward' : outward_filter_data
+    }
+
+    return render(request, 'showroom/view_showroom_return.html', context)
     
+  
 
 @admin_required(login_url="login")
 def update_outward(request, outward_id):
@@ -1243,13 +1267,13 @@ def delete_outward(request, outward_id):
 
     if con:
 
+        data = bike_number_outward.objects.filter(outward = con).values_list('bike_number__chasis_no', flat=True)
+
+
         if con.distributor:
 
-
-            data = bike_number_outward.objects.filter(outward = con).values_list('bike_number__chasis_no', flat=True)
-
             a = distributor_bike_number_outward.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
-
+            a = list(set(a))
             if a:
 
                 msg  = ', '.join(a) + " Already sold by Distributor"
@@ -1262,9 +1286,14 @@ def delete_outward(request, outward_id):
                 }
 
                 return render(request, 'transactions/list_outward.html', context)
-                                    
-            b = distributor_bike_number_return.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
+
             
+                                    
+            b = distributor_bike_number_return.objects.filter(company_outward = con).values_list('bike_number__chasis_no', flat=True)
+            print('-----------printing b 1-----------------')
+            print(b)
+            print(data)
+            b = list(set(b))
             if b:
 
                 msg  = ', '.join(b) + " Already Return to you by Distributor"
@@ -1278,7 +1307,7 @@ def delete_outward(request, outward_id):
 
                 return render(request, 'transactions/list_outward.html', context)
             
-
+            print('----------h h --------------')
             try:
 
                 con1 = bike_number_outward.objects.filter(outward = con)
@@ -1307,10 +1336,10 @@ def delete_outward(request, outward_id):
         else:
 
             
-            data = bike_number_outward.objects.filter(outward = con).values_list('bike_number__chasis_no', flat=True)
-
             a = showroom_bike_number_outward.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
-
+            print('----------------------printing a---------')
+            print(a)
+            a = list(set(a))
             if a:
 
                 msg  = ', '.join(a) + " Already sold by Showroom"
@@ -1324,9 +1353,13 @@ def delete_outward(request, outward_id):
 
                 return render(request, 'transactions/list_outward.html', context)
                                     
-            b = showroom_bike_number_return.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat=True)
-            
+            b = showroom_bike_number_return.objects.filter(outward_company = con).values_list('bike_number__chasis_no', flat=True)
+            print('-----------printing b-----------------')
+            print(b)
             if b:
+
+                b = list(set(b))
+
 
                 msg  = ', '.join(b) + " Already Return to you by Showroom"
 
@@ -1399,29 +1432,50 @@ def bill_generate_outward(request, outward_id):
     if outward_data.bike_qty > 1:
 
         bike_number_outward_data = bike_number_outward.objects.filter(outward=outward_data)
+
+        print('bike_number_outward_data')
         print(bike_number_outward_data)
+
         all_price = []
 
-        for i in bike_number_outward_data:
 
-            if outward_data.distributor:
+        if outward_data.distributor:
 
-                print('in outward')
+            print('in dis')
 
-                
-            
+            bike_detials_return = distributor_bike_number_return.objects.filter(company_outward = outward_data)
+
+            for i in bike_number_outward_data:
                 
                 variant1 = i.bike_number.inward.variant
                 p = prices.objects.get(variant = variant1)
                 all_price.append(p.distributor_price)
                 
                 total_price = sum(all_price)
-                address = outward_data.distributor.address
-                mobile_no = outward_data.distributor.mobile_number
-                taker_name = outward_data.distributor.name
-                gst = outward_data.distributor.GSTIN_no
+               
+               
+            for i in bike_detials_return:
+
+                variant1 = i.bike_number.inward.variant
+                p = prices.objects.get(variant = variant1)
+                all_price.append(p.distributor_price)
+                
+                total_price = sum(all_price)
+            address = outward_data.distributor.address
+            mobile_no = outward_data.distributor.mobile_number
+            taker_name = outward_data.distributor.name
+            gst = outward_data.distributor.GSTIN_no
                     
-            else:
+        else:
+
+            print('in show')
+
+
+            bike_detials_return = showroom_bike_number_return.objects.filter(outward_company = outward_data)
+            print('bike_detials_return')
+            print(bike_detials_return)
+            for i in bike_number_outward_data:
+
 
                 print('in inward')
 
@@ -1431,10 +1485,27 @@ def bill_generate_outward(request, outward_id):
                 
                 total_price = sum(all_price)
                 grand_total_price = ((total_price / 100) * 5) + total_price
-                address = outward_data.showroom.address
-                mobile_no = outward_data.showroom.mobile_number
-                taker_name = outward_data.showroom.name
-                gst = outward_data.showroom.GSTIN_no
+
+            address = outward_data.showroom.address
+            mobile_no = outward_data.showroom.mobile_number
+            taker_name = outward_data.showroom.name
+            gst = outward_data.showroom.GSTIN_no
+
+
+
+
+            for i in bike_detials_return:
+
+
+                print('in inward')
+
+                variant1 = i.bike_number.inward.variant
+                p = prices.objects.get(variant = variant1)
+                all_price.append(p.dealer_price)
+                
+                total_price = sum(all_price)
+                grand_total_price = ((total_price / 100) * 5) + total_price
+              
 
 
         print(all_price)
@@ -1469,6 +1540,19 @@ def bill_generate_outward(request, outward_id):
         Dict1 = {}
         
         for i in bike_number_outward_data:
+
+
+            if i.bike_number.inward.variant in Dict1:
+
+                val = Dict1[i.bike_number.inward.variant]
+                print('val')
+                print(val)
+                Dict1.update({ i.bike_number.inward.variant : (val + 1) })
+            else:
+
+                Dict1[i.bike_number.inward.variant] = 1
+
+        for i in bike_detials_return:
 
 
             if i.bike_number.inward.variant in Dict1:

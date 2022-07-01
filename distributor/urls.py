@@ -26,7 +26,7 @@ urlpatterns = [
     path('list-return/', list_return, name='list_return'),
     path('view-return/<return_id>', view_return, name='view_return'),
     path('list-showroom-return/', list_showroom_return, name='list_showroom_return'),
-    path('view-showroom-return/', view_showroom_return, name='view_showroom_return'),
+    path('view-showroom-return/<return_id>', view_showroom_return, name='view_showroom_return'),
     
     path('add-request/', add_request, name='distributor_add_request'),
     path('update-request/<request_id>', update_request, name='distributor_update_request'),

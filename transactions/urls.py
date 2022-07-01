@@ -30,7 +30,7 @@ urlpatterns = [
     path('list-return-distributor/', admin_list_return_distributor, name='admin_list_return_distributor'),
     path('view-return-distributor/<distributor_return_id>', view_admin_list_return_distributor, name='view_admin_list_return_distributor'),
     path('list-return-showroom/', admin_list_return_showroom, name='admin_list_return_showroom'),
-    path('view-return-showroom/', admin_list_return_showroom, name='admin_list_return_showroom'),
+    path('view-return-showroom/<return_id>', admin_view_return_showroom, name='admin_view_return_showroom'),
  
 
     

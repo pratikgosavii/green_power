@@ -664,9 +664,9 @@ def add_return(request):
 
                 if bike_number_instance_company:
 
-                    bike_data = bike_number_instance_company
+                    bike_data = bike_number.objects.get(chasis_no = i)
 
-                    bike_outward_update = bike_number_outward.objects.get(bike_number = bike_data.bike_number)
+                    bike_outward_update = bike_number_outward.objects.get(bike_number = bike_data)
 
                     print('bike_outward_update')
                     print(bike_outward_update)
@@ -677,15 +677,15 @@ def add_return(request):
                     print(outward_comp)
 
                     show_in = showroom_inward.objects.get(company_outward = outward_comp)
-                    showroom_bike_number_return.objects.create(bike_number = bike_data.bike_number, showroom_return = instance, inward = show_in, price = bike_data.price, outward_company = bike_outward_update.outward)
+                    showroom_bike_number_return.objects.create(bike_number = bike_data, showroom_return = instance, inward = show_in, price = bike_outward_update.price, outward_company = bike_outward_update.outward)
                     try:
 
                         
-                        showroom_stock_instance = showroom_stock.objects.get(variant = bike_data.bike_number.inward.variant, color = bike_data.bike_number.color, user = request.user)
+                        showroom_stock_instance = showroom_stock.objects.get(variant = bike_data.inward.variant, color = bike_data.color, user = request.user)
                         showroom_stock_instance.total_bike = showroom_stock_instance.total_bike - 1
                         showroom_stock_instance.save()
 
-                        company_stock = stock.objects.get(variant = bike_data.bike_number.inward.variant, color = bike_data.bike_number.color)
+                        company_stock = stock.objects.get(variant = bike_data.inward.variant, color = bike_data.color)
                         company_stock.total_bike = company_stock.total_bike + 1
                         company_stock.save()
 
@@ -699,27 +699,28 @@ def add_return(request):
 
                 else:
 
-                    bike_data = bike_number_instance_distributor
+                    bike_data_outward = bike_number_instance_distributor
+                    bike_data = bike_number.objects.get(chasis_no = i)
 
-                    bike_outward_update = distributor_bike_number_outward.objects.get(bike_number = bike_data.bike_number)
+                    bike_outward_update = distributor_bike_number_outward.objects.get(bike_number = bike_data)
 
                     outward_comp = bike_outward_update.outward
                     show_in = showroom_inward.objects.get(distributor_outward = outward_comp)
-                    showroom_bike_number_return.objects.create(bike_number = bike_data.bike_number, showroom_return = instance, inward = show_in, price = bike_data.price, outward_distributor = bike_outward_update.outward)
+                    showroom_bike_number_return.objects.create(bike_number = bike_data, showroom_return = instance, inward = show_in, price = bike_data_outward.price, outward_distributor = bike_outward_update.outward)
                     
                     
                     try:
 
                         
-                        showroom_stock_instance = showroom_stock.objects.get(variant = bike_data.bike_number.inward.variantt, color = bike_data.bike_number.color, user = request.user)
+                        showroom_stock_instance = showroom_stock.objects.get(variant = bike_data.inward.variant, color = bike_data.color, user = request.user)
                         showroom_stock_instance.total_bike = showroom_stock_instance.total_bike - 1
                         showroom_stock_instance.save()
 
                         showroom_instance = showroom.objects.get(user = request.user)
 
-                        distributor_stock = distributor_stock.objects.get(variant = bike_data.bike_number.inward.variant, color = bike_data.bike_number.color, user = showroom_instance.Distributor)
-                        distributor_stock.total_bike = distributor_stock.total_bike - 1
-                        distributor_stock.save()
+                        distributor_stock_instance = distributor_stock.objects.get(variant = bike_data.inward.variant, color = bike_data.color, user = showroom_instance.Distributor.user)
+                        distributor_stock_instance.total_bike = distributor_stock_instance.total_bike + 1
+                        distributor_stock_instance.save()
 
                    
                     except Exception as e: 
@@ -818,7 +819,7 @@ def view_return(request, return_id):
 
     instance = showroom_return.objects.get(id = return_id)
 
-    data = showroom_bike_number_return.objects.filter(distributor_return = instance)
+    data = showroom_bike_number_return.objects.filter(showroom_return = instance)
 
     # outward_filter_data = outward_filter()
 

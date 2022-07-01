@@ -586,7 +586,7 @@ def view_showroom_return(request, return_id):
 
     instance = showroom_return.objects.get(id = return_id)
 
-    data = showroom_bike_number_return.objects.filter(distributor_return = instance)
+    data = showroom_bike_number_return.objects.filter(showroom_return = instance)
 
     # outward_filter_data = outward_filter()
 
@@ -802,39 +802,52 @@ def delete_outward(request, outward_id):
 
 
         data = distributor_bike_number_outward.objects.filter(outward = con).values_list('bike_number__chasis_no', flat = True)
-        distributor_instance = distributor.objects.get(user = request.user)
-        showroom_instance = showroom.objects.get(Distributor = distributor_instance)
 
-        a = showroom_outward.objects.filter(user = showroom_instance.user)
+        show_bike = showroom_bike_number_outward.objects.filter(bike_number__chasis_no__in = data).values_list('bike_number__chasis_no', flat = True)
+      
 
-        for i in a:
+        if show_bike:
 
-            show_bike = showroom_bike_number_outward.objects.filter(outward = i).values_list('bike_number__chasis_no', flat = True)
-            print('here it is')
-            print(data)
-            print(show_bike)
-            print('here it is')
+            a = list(set(a))
 
-            show_bike
+            msg  = ', '.join(a) + " Already sold by Distributor"
+
+            data = distributor_outward.objects.filter(user = request.user)
+
+            context = {
+                'data': data,
+                'msg': msg,
+                # 'filter_outward' : outward_filter_data
+            }
+
+            return render(request, 'distributor/list_outward.html', context)
+        
+        
+        b = showroom_bike_number_return.objects.filter(outward_distributor = con).values_list('bike_number__chasis_no', flat=True)
+
+        if b:
+
+            b = list(set(b))
+
+            print('-----------printing b-----------------')
+            print(b)
+            if b:
+
+                b = list(set(b))
 
 
+                msg  = ', '.join(b) + " Already Return to you by Showroom"
 
-            if any(item in show_bike for item in data):
+            data = distributor_outward.objects.filter(user = request.user)
 
+            context = {
+                'data': data,
+                'msg': msg,
+                # 'filter_outward' : outward_filter_data
+            }
 
-
-                msg  = "Cant delete Outward, bike is already in outward of distributor hn"
-
-                data = distributor_outward.objects.filter(user = request.user)
-
-                context = {
-                    'data': data,
-                    'msg': msg,
-                    # 'filter_outward' : outward_filter_data
-                }
-
-                return render(request, 'distributor/list_outward.html', context)
-
+            return render(request, 'distributor/list_outward.html', context)
+        
         
 
         try:
@@ -1731,6 +1744,14 @@ def bill_generate_distributor_outward(request, distributor_outward_id):
             variant1 = i.bike_number.inward.variant
             p = prices.objects.get(variant = variant1)
             all_price.append(p.dealer_price)
+
+
+
+        bike_number_showroom_return = showroom_bike_number_return.objects.filter(outward_distributor=outward_data)
+        for i in bike_number_showroom_return:
+            variant1 = i.bike_number.inward.variant
+            p = prices.objects.get(variant = variant1)
+            all_price.append(p.dealer_price)
             
         total_price = sum(all_price)
         address = outward_data.showroom.address
@@ -1769,6 +1790,19 @@ def bill_generate_distributor_outward(request, distributor_outward_id):
         Dict1 = {}
         
         for i in bike_number_outward_data:
+
+
+            if i.bike_number.inward.variant in Dict1:
+
+                val = Dict1[i.bike_number.inward.variant]
+                print('val')
+                print(val)
+                Dict1.update({ i.bike_number.inward.variant : (val + 1) })
+            else:
+
+                Dict1[i.bike_number.inward.variant] = 1
+
+        for i in bike_number_showroom_return:
 
 
             if i.bike_number.inward.variant in Dict1:
@@ -1936,6 +1970,21 @@ def bill_generate_distributor_outward(request, distributor_outward_id):
         DATA8.append(['0', 'Variant', 'Color', 'Chasis No', 'Motor No', 'Controller No'])
 
         for i in bike_number_outward_data:
+
+            next_data.append(cou)
+            next_data.append(i.bike_number.inward.variant)
+            next_data.append(i.bike_number.color)
+            next_data.append(i.bike_number.chasis_no)
+            next_data.append(i.bike_number.motor_no)
+            next_data.append(i.bike_number.controller_no)
+
+            cou = cou + 1
+
+            DATA8.append(next_data)
+
+            next_data = []
+
+        for i in bike_number_showroom_return:
 
             next_data.append(cou)
             next_data.append(i.bike_number.inward.variant)
@@ -2152,13 +2201,14 @@ def bill_generate_distributor_outward(request, distributor_outward_id):
     else:
 
         outward_data = distributor_outward.objects.get(id=distributor_outward_id)
-        bike_number_outward_data = distributor_bike_number_outward.objects.filter(outward=outward_data)
-
-
 
         print('in outward')
+        try:
+            bike_detials = distributor_bike_number_outward.objects.get(outward = outward_data)
+        except:
+            bike_detials = showroom_bike_number_return.objects.get(outward_distributor=outward_data)
 
-        bike_detials = distributor_bike_number_outward.objects.get(outward = outward_data)
+
         variant = bike_detials.bike_number.inward.variant
         hsc = variant.hsn_sac
 

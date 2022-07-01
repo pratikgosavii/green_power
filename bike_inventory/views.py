@@ -12,6 +12,9 @@ from stores.models import *
 @login_required(login_url='login')
 def dashboard(request):
 
+    distributor_count = 0
+    dealers_count = 0
+
     if request.user.is_superuser: 
 
         stock_ = []
