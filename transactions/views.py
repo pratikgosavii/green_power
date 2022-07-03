@@ -311,6 +311,32 @@ def detail_list_outward(request):
 
 
 @admin_required(login_url="login")
+def detail_list_distributor_return(request):
+
+    data = distributor_bike_number_return.objects.all()
+
+    context = {
+        'data': data,
+        # 'filter_inward' : inward_filter_data
+    }
+
+    return render(request, 'transactions/detail_list_distributor_return.html', context)
+
+
+@admin_required(login_url="login")
+def detail_list_dealer_return(request):
+
+    data = showroom_bike_number_return.objects.filter(outward_distributor = None)
+
+    context = {
+        'data': data,
+        # 'filter_inward' : inward_filter_data
+    }
+
+    return render(request, 'transactions/detail_list_dealer_return.html', context)
+
+
+@admin_required(login_url="login")
 def view_dealer_request(request):
 
     data1 = showroom_request.objects.filter(distributor = None)

@@ -890,10 +890,7 @@ def add_request(request):
         stock_data = stock.objects.all()
 
         list1 = []
-        list2 = []
-        list3 = []
-        main_list = []
-
+       
         for i in stock_data:
 
             if i.total_bike > 0:

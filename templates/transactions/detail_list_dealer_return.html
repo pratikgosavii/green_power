@@ -95,7 +95,7 @@
     <div class="col-xl-12">
         <div class="card">
             <div class="card-body">
-                <h4 class="box-title">Detail List Outward </h4>
+                <h4 class="box-title">Detail List Dealer Return </h4>
             </div>
             <div class="card-body--">
                 <div class="table-stats order-table ov-h">
@@ -103,12 +103,11 @@
                         <thead>
                             <tr>
                                 <th class="serial">#</th>
+                                <th>Dealer</th>
                                 <th>Variant</th>
                                 <th>Chasis No</th>
                                 <th>Motor No</th>
                                 <th>Controller No</th>
-                                <th>Distributor</th>
-                                <th>Showroom</th>
                                 <th>Date</th>
 
                             </tr>
@@ -118,13 +117,12 @@
                             {% for i in data %}
                             <tr>
                                 <td class="serial">{{ forloop.counter }}</td>
+                                <td>{{ i.inward.user }}</td>
                                 <td>{{ i.bike_number.inward.variant }}</td>
                                 <td>{{ i.bike_number.chasis_no }}</td>
                                 <td>{{ i.bike_number.motor_no }}</td>
                                 <td>{{ i.bike_number.controller_no }}</td>
-                                <td>{{ i.outward.distributor }}</td>
-                                <td>{{ i.outward.showroom }}</td>
-                                <td>{{ i.outward.date }}</td>
+                                <td>{{ i.distributor_return.date }}</td>
                                
 
                             </tr>

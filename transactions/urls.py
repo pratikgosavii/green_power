@@ -21,6 +21,8 @@ urlpatterns = [
     
     path('detail-list-inward/', detail_list_inward, name='detail_list_inward'),
     path('detail-list-outward/', detail_list_outward, name='detail_list_outward'),
+    path('detail-list-distributor-return/', detail_list_distributor_return, name='detail_list_distributor_return'),
+    path('detail-list-dealer-return/', detail_list_dealer_return, name='detail_list_dealer_return'),
 
     path('add-outward/', add_outward, name='add_outward'),
     path('update-outward/<outward_id>', update_outward, name='update_outward'),
