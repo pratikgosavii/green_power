@@ -8,6 +8,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse, HttpResponse, JsonResponse
+from pyparsing import ExceptionWordUnicode
 from distributor.models import distributor_inward
 from showroom.models import *
 from distributor.models import *
@@ -61,7 +62,27 @@ import pytz
 
 IST = pytz.timezone('Asia/Kolkata')
 
+bill_number_counter = 1
 
+
+
+def increment_bill_number():
+    print('here in ')
+    global bill_number_counter
+    print(bill_number_counter)
+    bill_number_counter = bill_number_counter + 1
+    print(bill_number_counter)
+
+
+    return 0
+
+def get_bill_number():
+
+    global use_bill_number
+    increment_bill_number()
+    use_bill_number = "GP" + str(bill_number_counter)
+
+    return use_bill_number
 
 
 # Create your views here.
@@ -102,92 +123,86 @@ def add_inward(request):
 
        
         DC_date = request.POST.get('date')
-        chasis_no = request.POST.getlist('chasis_no[]')
-        motor_no = request.POST.getlist('motor_no[]')
-        controller_no = request.POST.getlist('controller_no[]')
-        color = request.POST.getlist('color[]')
+        variant_list = request.POST.getlist('variant[]')
+        color_list = request.POST.getlist('color[]')
+        bike_list = request.POST.getlist('bike_qty[]')
         
-        bike_qty = len(chasis_no)
-        
-        print(chasis_no)
-
-        bike_number_data = bike_number.objects.all()
-
-        for i in bike_number_data:
-
-            if i.chasis_no in chasis_no:
-                return JsonResponse({'status' : i.chasis_no + ' Chasis Number already exsist'}, safe=False)
-            if i.motor_no in motor_no:
-                return JsonResponse({'status' : i.motor_no + ' Motor Number already exsist'}, safe=False)
-            if i.controller_no in controller_no:
-                return JsonResponse({'status' : i.controller_no + ' Controller_no Number already exsist'}, safe=False)
-
-           
+       
         if DC_date:
 
             date_time = numOfDays(DC_date)
         else:
             date_time = datetime.now(IST)
+
+
+        print('color_list')
+        print('color_list')
+        print('color_list')
+        print('color_list')
+        print('color_list')
+        print(color_list)
         
-        updated_request = request.POST.copy()
-        updated_request.update({'date': date_time, 'bike_qty' : bike_qty})
-        forms = inward_Form(updated_request)
-
-        print('come to')
-
-        if forms.is_valid():
-
-            print('in valid')
-            instance = forms.save(commit=False)
-            instance.created_by = request.user
-            instance.save()
+       
+        for a,b,c in zip(variant_list, color_list, bike_list):
 
 
+            color_data = Color.objects.get(id = b)
+            variant_data = variant.objects.get(id = a)
             
-            for a,b,c,d in zip(chasis_no, motor_no, controller_no, color):
 
-                print('--')
+                
+            updated_request = request.POST.copy()
+            updated_request.update({'variant' : variant_data, 'color' : color_data, 'bike_qty' : c, 'date': date_time})
+            forms = inward_Form(updated_request)
 
-                color_data = Color.objects.get(id = d)
+            print('come to')
 
-                bike_number.objects.create(inward = instance, chasis_no = a,  motor_no = b, controller_no = c, color = color_data)
+            if forms.is_valid():
+
+                instance = forms.save(commit=False)
+                instance.created_by = request.user
+                instance.save()
+
+                for z in range(int(c)):
+
+                    bike_number.objects.create(inward = instance, color = color_data)
                 
                 try:
 
-                    test = stock.objects.get(variant=instance.variant, color = color_data)
+                    test = stock.objects.get(variant=variant_data)
 
-                    test.total_bike = test.total_bike + 1
+                    test.total_bike = test.total_bike + int(c)
 
                     test.save()
 
                 except stock.DoesNotExist:
 
-                    stock.objects.create(variant=instance.variant, color = color_data, total_bike = 1)
-
-
-            return JsonResponse({'status' : 'done'}, safe=False)
-
+                    stock.objects.create(variant=variant_data, color = color_data, total_bike = 1)
+            else:
+                    
             
-        else:
+                error = forms.errors()
+                print(error)
+                return JsonResponse({'error' : error}, safe=False)
 
-            print('in else')
 
+        return JsonResponse({'status' : 'done'}, safe=False)
 
-            error = forms.errors.as_json()
-            print(error)
-            return JsonResponse({'error' : error}, safe=False)
-
+        
     else:
 
 
         forms = inward_Form()
 
         color_data = Color.objects.all()
+        variant_data = variant.objects.all()
 
         context = {
             'form': forms,
             'color_data': color_data,
+            'variant_data': variant_data,
         }
+
         return render(request, 'transactions/add_inward.html', context)
 
 @admin_required(login_url="login")
@@ -284,6 +299,80 @@ def list_inward(request):
     }
 
     return render(request, 'transactions/list_inward.html', context)
+
+
+
+
+import pandas as pd
+
+
+
+
+@admin_required(login_url="login")
+def import_code(request):
+
+
+
+        
+    df = pd.read_csv('static/countries.csv')
+
+    print(df.area)
+    # do some other stuff
+
+
+
+    # with open('films/pixar.csv') as file:
+    #     reader = csv.reader(file)
+    #     next(reader)  # Advance past the header
+
+        
+    #     for row in reader:
+    #         print(row)
+
+
+    #         bike_number.objects.get()
+            
+
+
+
+    #         film = Film(title=row[0],
+    #                     year=row[2],
+    #                     genre=genre)
+    #         film.save()
+
+
+
+@admin_required(login_url="login")
+def update_bike_number(request):
+
+
+    bike_number_id = request.POST.getlist('bike_number_id[]')
+    chasis_no = request.POST.getlist('chasis_no[]')
+    motor_no = request.POST.getlist('motor_no[]')
+    controller_no = request.POST.getlist('controller_no[]')
+
+
+    print(bike_number_id)
+    print(chasis_no)
+    print(motor_no)
+
+
+    for a,b,c,d in zip(bike_number_id, chasis_no, motor_no, controller_no):
+
+        try:
+            bike_number_instance = bike_number.objects.get(id = a)
+            bike_number_instance.chasis_no = b
+            bike_number_instance.motor_no = c  
+            bike_number_instance.controller_no = d
+            bike_number_instance.status = True
+            bike_number_instance.save()
+        except Exception as e:
+
+            return JsonResponse({'error' : e}, safe=False)
+
+
+    return JsonResponse({'status' : 'done'}, safe=False)
+
 
 @admin_required(login_url="login")
 def detail_list_inward(request):
@@ -956,8 +1045,17 @@ def add_outward(request):
         print('distributor_data')
         print(distributor_data)
 
+        set_bill_number = get_bill_number()
+        print('----')
+        print('----')
+        print('----')
+        print('----')
+        print('----')
+        print(set_bill_number)
+
         updated_request = request.POST.copy()
-        updated_request.update({'date': date_time, 'bike_qty' : bike_qty, 'showroom' : showroom_data, 'distributor' : distributor_data})
+        updated_request.update({'date': date_time, 'bike_qty' : bike_qty, 'showroom' : showroom_data, 'distributor' : distributor_data, 'bill_number' : set_bill_number})
+        print(updated_request)
         forms = outward_Form(updated_request)
 
 
@@ -2715,3 +2813,80 @@ def generate_gstr1(request):
 
     # building pdf
     pdf1.save()
+
+from django.db.models import Count, Sum
+
+
+
+def demo(request):
+
+    import csv  
+
+    data = outward.objects.filter(date__range=["2022-07-01", "2022-07-30"])
+
+    
+    bike_details = bike_number_outward.objects.filter(outward__in = data).values('bike_number__inward__variant__hsn_sac').annotate(total_bikes=Count('id'), total_price = Sum('price'))
+   
+
+    bike_details = list(bike_details)
+
+    print(bike_details)
+
+    for i in bike_details:
+
+        a = i.values()
+
+        print(a)
+
+
+    data_hsn = []
+
+    data_hsn.append(['Summary For HSN'])
+    data_hsn.append(['No. of HSN', '', '', '', 'Total Value', '', 'Total Taxable Value', 'Total Integrated Tax', 'Total Central Tax', 'Total State/UT Tax',	'Total Cess'])
+    data_hsn.append(['HSN',	'Description',	'UQC',	'Total Quantity'	,'Total Value',	'Rate',	"Taxable Value",	"Integrated Tax Amount",	"Central Tax Amount",	'State/UT Tax Amount',	'Cess Amount'])
+
+
+    for z in bike_details:
+
+        
+
+        i = list(z.values())
+
+        data_hsn.append([i[0], '', 'PCS-PIECES', i[2],i[1], ''])
+
+
+
+        
+
+    # with open('countries.csv', 'w', encoding='UTF8') as f:
+    #     writer = csv.writer(f)
+
+    #     # write the header
+    #     writer.writerow(header)
+
+    #     # write the data
+    #     writer.writerows(data)
+
+    data_b2b = []
+
+    data_b2b.append(['Summary For B2B(4)'])
+
+												
+    data_b2b.append(['No. of Recipients', '', 'No. of Invoices', '', 'Total Invoice Value', '', '', '', '', '', 'Total Taxable Value', 'Total Cess'])
+
+    data_b2b.append(['GSTIN/UIN of Recipient', 'Receiver Name',	'Invoice Number', 'Invoice date', 'Invoice Value', 'Place Of Supply', "Reverse Charge",	'Applicable % of Tax Rate', "Invoice Type", 'Rate', 'Taxable Value', 'Cess Amount'])
+
+    for i in data:
+        bik = bike_number_outward.objects.filter(outward = i).values_list('price', flat = True)
+        bik_total = sum(bik)
+        if i.distributor:
+            data_b2b.append([i.distributor.GSTIN_no, i.distributor.name, i.bill_number, i.date, bik_total, 'place of supply', 'reverse charge', 'Applicable % of Tax Rate', 'invoice type', 'Rate', 'Taxable Value', 'Cess Amount'])
+        else:
+            data_b2b.append([i.showroom.GSTIN_no, i.showroom.name, i.bill_number, i.date, bik_total, 'place of supply', 'reverse charge', 'Applicable % of Tax Rate', 'invoice type', 'Rate', 'Taxable Value', 'Cess Amount'])
+    import pandas as pd
+    data_b2b = pd.DataFrame(data_b2b)
+    print(data_b2b)
+
+
+
+    data_gstr1

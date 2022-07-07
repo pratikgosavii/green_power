@@ -18,6 +18,11 @@ urlpatterns = [
     path('update-inward/<inward_id>', update_inward, name='update_inward'),
     path('delete-inward/<inward_id>', delete_inward, name='delete_inward'),
     path('list-inward/', list_inward, name='list_inward'),
+
+    path('import-csv', import_code, name='import_code'),
+
+    path('update-bike_number', update_bike_number, name='update_bike_number'),
+
     
     path('detail-list-inward/', detail_list_inward, name='detail_list_inward'),
     path('detail-list-outward/', detail_list_outward, name='detail_list_outward'),
@@ -33,6 +38,9 @@ urlpatterns = [
     path('view-return-distributor/<distributor_return_id>', view_admin_list_return_distributor, name='view_admin_list_return_distributor'),
     path('list-return-showroom/', admin_list_return_showroom, name='admin_list_return_showroom'),
     path('view-return-showroom/<return_id>', admin_view_return_showroom, name='admin_view_return_showroom'),
+    
+    
+    path('demo', demo, name='demo'),
  
 
     

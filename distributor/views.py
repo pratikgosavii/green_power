@@ -27,6 +27,8 @@ from django.urls import reverse
 from datetime import date
 from showroom.models import *
 
+from transactions.views import get_bill_number, increment_bill_number
+
 from django.contrib.auth.decorators import user_passes_test
 
 
@@ -146,6 +148,7 @@ def accept_inward(request, inward_id):
     return redirect('distributor_list_inward')
 
 
+
 @distributor_required(login_url='login')
 def add_outward(request):
 
@@ -197,8 +200,9 @@ def add_outward(request):
         bike_qty = len(chasis_no)
 
         updated_request = request.POST.copy()
-        updated_request.update({'date': date_time, 'bike_qty': bike_qty})
+        updated_request.update({'date': date_time, 'bike_qty': bike_qty, 'bill_number' : get_bill_number()})
         forms = distributor_outward_Form(updated_request)
+
 
         if forms.is_valid():
 
@@ -443,7 +447,7 @@ def add_return(request):
         print('here')
 
         updated_request = request.POST.copy()
-        updated_request.update({'date': date_time, 'bike_qty' : bike_qty})
+        updated_request.update({'date': date_time, 'bike_qty' : bike_qty, 'bill_number' : get_bill_number()})
         forms = distributor_return_Form(updated_request)
 
         print('-----------')

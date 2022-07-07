@@ -28,6 +28,8 @@ from datetime import date
 from django.urls import reverse
 from datetime import date
 
+from transactions.views import get_bill_number, increment_bill_number
+
 from django.contrib.auth.decorators import user_passes_test
 
 
@@ -382,7 +384,7 @@ def add_outward(request):
         updated_request = request.POST.copy()
         print('0----------------------------------------')
         print(updated_request)
-        updated_request.update({'date': date_time, 'bike_qty': bike_qty})
+        updated_request.update({'date': date_time, 'bike_qty': bike_qty, 'bill_number' : get_bill_number()})
         forms = showroom_outward_Form(updated_request)
 
         if forms.is_valid():
@@ -638,7 +640,7 @@ def add_return(request):
         print('here')
 
         updated_request = request.POST.copy()
-        updated_request.update({'date': date_time, 'bike_qty' : bike_qty})
+        updated_request.update({'date': date_time, 'bike_qty' : bike_qty, 'bill_number' : get_bill_number()})
         forms = showroom_return_Form(updated_request)
 
         print('-----------')

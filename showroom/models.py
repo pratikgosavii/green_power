@@ -53,6 +53,7 @@ class showroom_req(models.Model):
     variant = models.ForeignKey(variant, on_delete=models.CASCADE, related_name='xcxcsxcs')
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='xcxcsxcs')
     bike_qty = models.IntegerField()
+    bill_number = models.CharField(max_length=50, blank = True, null=True)
 
 
 
@@ -76,6 +77,7 @@ class showroom_outward(models.Model):
     battery_type =models.CharField(max_length=50, blank = False, null=False, choices=battery_CHOICES, default='lithium')
     bike_qty = models.IntegerField()
     customer_service_no = models.IntegerField()
+    bill_number = models.CharField(max_length=50, blank = True, null=True)
 
 
 class showroom_bike_number_outward(models.Model):

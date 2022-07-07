@@ -43,6 +43,7 @@ class distributor_outward(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bike_qty = models.IntegerField()
+    bill_number = models.CharField(max_length=50, blank = True, null=True)
 
 
 class distributor_bike_number_outward(models.Model):
@@ -61,6 +62,8 @@ class distributor_return(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bike_qty = models.IntegerField()
+    bill_number = models.CharField(max_length=50, blank = True, null=True)
+
 
 
 class distributor_bike_number_return(models.Model):

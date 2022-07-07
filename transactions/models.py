@@ -9,6 +9,7 @@ from django.db import models
 from datetime import datetime, timezone
 
 from django.forms import IntegerField
+from traitlets import default
 from stores.models import *
 
 
@@ -23,6 +24,9 @@ class inward(models.Model):
     bike_qty =  models.IntegerField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
+    color =  models.ForeignKey(Color, on_delete=models.CASCADE)
+
+
     # showroom
     
     def __str__(self):
@@ -48,7 +52,8 @@ class outward(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     bike_qty = models.IntegerField()
-    
+    bill_number = models.CharField(max_length=50)
+
 
 
 class stock(models.Model):
@@ -62,14 +67,15 @@ class stock(models.Model):
 class bike_number(models.Model):
 
     inward = models.ForeignKey(inward, on_delete=models.CASCADE)
-    chasis_no = models.CharField(max_length=120, unique=True)
-    motor_no= models.CharField(max_length=120, unique=True)
-    controller_no = models.CharField(max_length=120, unique=True)
+    chasis_no = models.CharField(max_length=120, unique=True, blank=True, null=True)
+    motor_no= models.CharField(max_length=120, unique=True, blank=True, null=True)
+    controller_no = models.CharField(max_length=120, unique=True, blank=True, null=True)
     color =  models.ForeignKey(Color, on_delete=models.CASCADE)
+    status =  models.BooleanField(default = True, blank=True, null=True)
 
 
     def __str__(self):
-        return self.chasis_no
+        return self.color.name
 
     
     def natural_key(self):

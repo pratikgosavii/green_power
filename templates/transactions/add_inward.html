@@ -50,27 +50,17 @@
                         <form id ="inward_form">
                             {% csrf_token %}
 
-                            <div class="form-group">
-                                <label for="name" class="control-label mb-1">Variant</label>
-                                {{ form.variant }}
-                                <small class="text-danger"> {{ form.bike.errors.as_text }} </small>
-
-                            </div>
-                            
-                            <label for="name" class="control-label mb-1">Bike Qty</label>
-
-                            <div class="form-group" style="display:flex;">
-                                {{ form.bike_qty }}
-                                <small class="text-danger"> {{ form.bike_qty.errors.as_text }} </small>
-
-                                <button class="btn btn-info" style="margin-left:10px;" type="button" onclick="dynamic_textbox()" >submit </button>
-                            </div> 
 
                             <div id="dyanamic" name="dyanamic">
                                 
                             </div>
 
-
+                            <div style="justify-content: center;display: flex;align-items: center;" id="single">
+                                <button onclick="single_dynamic_textbox()" id="payment-button" style="background-color: #007bff; border-color: #007bff; padding: 10px;border-radius: 12px;color: white;" type="button" class="btn ">
+                                     <span id="payment-button-amount">Add More  +</span>
+                                 </button>
+                               
+                            </div><br>
 
                             <div style="justify-content: center;display: none;align-items: center;" id="single">
                                  <button onclick="single_dynamic_textbox()" id="payment-button" style="background-color: #007bff; border-color: #007bff; padding: 10px;border-radius: 12px;color: white;" type="button" class="btn ">
@@ -115,6 +105,7 @@
     function single_dynamic_textbox(){
 
         let z = ''
+        let y = ''
 
         {% for i in color_data %}
 
@@ -122,11 +113,21 @@
 
         {% endfor %}
 
+        {% for i in variant_data %}
+
+            y = y + '<option value= "{{ i.id }}"> {{ i.name }} </option>'
+
+        {% endfor %}
+
         var myHtml =   '<fieldset> <legend style="font-size: 15px;width: 14%;max-width: 100%;padding: 12px;"> Bike ' + g_count + '</legend>' 
-            + '<div class="form-group"> <label for="name" class="control-label mb-1">Chasis Number</label> <input type="text" name="chasis_no" class="form-control" id="company" maxlength="120" required=""> </div>'
-            + '<div class="form-group"> <label for="name" class="control-label mb-1">Motor Number</label> <input type="text" name="motor_no" class="form-control" id="company" maxlength="120" required=""> </div>'
-            + '<div class="form-group"> <label for="name" class="control-label mb-1">Controller Number</label> <input type="text" name="controller_no" class="form-control" id="company" maxlength="120" required=""> </div>'
             
+            + `<label for="name" class="control-label mb-1">Variant</label>` 
+            + `<select name="variant" class="form-control" id="color" required=""> <option value="" selected="">---------</option>`
+              
+            + y
+              
+               
+            + `</select>`
             + `<label for="name" class="control-label mb-1">Color</label>` 
             + `<select name="color" class="form-control" id="color" required=""> <option value="" selected="">---------</option>`
               
@@ -135,13 +136,14 @@
                
             + `</select>`
             + `<small class="text-danger">  </small>`
+            + '<div class="form-group"> <label for="name" class="control-label mb-1">Bike qty Number</label> <input type="text" name="bike_qty" class="form-control" id="company" maxlength="120" required=""> </div>'
+
             
             + ' </fieldset>';
 
 
             $('#dyanamic').append(myHtml);
 
-            document.getElementById("bike_qty").value = g_count;
 
             g_count = g_count + 1
 
@@ -164,7 +166,6 @@
         {% endfor %}
 
        
-        bike_qty = document.getElementById("bike_qty").value;
         
         for (i = 1; i <= bike_qty; i++) {
             var myHtml =   '<fieldset> <legend style="font-size: 15px;width: 14%;max-width: 100%;padding: 12px;"> Bike ' + g_count + '</legend>' 
@@ -200,61 +201,29 @@
         e.preventDefault();
 
         
-        variant = document.getElementById("variant").value;
+        variant = document.getElementsByName("variant");
         
-
-        chasis_no = document.getElementsByName("chasis_no");
-        motor_no = document.getElementsByName("motor_no");
-        controller_no = document.getElementsByName("controller_no");
-        color = document.getElementsByName("color");
+        bike_qty = document.getElementsByName("bike_qty");
     
 
-        chasis_no_arr = []
-        motor_no_arr = []
-        controller_no_arr = []
+        variant_arr = []
+        bike_qty_arr = []
         color_arr = []
         
-        for (i = 0; i < chasis_no.length; i++) {
+        for (i = 0; i < variant.length; i++) {
 
-            if (chasis_no_arr.includes(chasis_no[i].value)){
-                $("#message_div").css("display","contents");
-                var div = document.getElementById('message');
-            
-                div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> Chasis No <strong>  ` +  chasis_no[i].value + `</strong>` + ` Entered multiple times <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
-                    document.body.scrollTop = document.documentElement.scrollTop = 0;
-                return false;
-            } 
-            if (motor_no_arr.includes(motor_no[i].value)){
-                var div = document.getElementById('message');
-            
-                div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> Motor No <strong> ` +  motor_no[i].value  + `</strong>` + ` Entered multiple times <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
-                    document.body.scrollTop = document.documentElement.scrollTop = 0;
-                        
-                return false;
-            } 
-            if (controller_no_arr.includes(controller_no[i].value)){
-                var div = document.getElementById('message');
-            
-                div.innerHTML += `<div class="alert alert-danger alert-dismissible fade show" id="message" role="alert"> Controller No  <strong>` +  controller_no[i].value  + `</strong>` + ` Entered multiple times <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
-                    document.body.scrollTop = document.documentElement.scrollTop = 0;
-                        
-                return false;
-            } 
-            chasis_no_arr.push(chasis_no[i].value);
-            motor_no_arr.push(motor_no[i].value);
-            controller_no_arr.push(controller_no[i].value);
+            variant_arr.push(variant[i].value);
             color_arr.push(color[i].value);
+            bike_qty_arr.push(bike_qty[i].value);
 
         }
 
         let form_data = {
             csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
-            chasis_no: chasis_no_arr,
-            motor_no: motor_no_arr,
-            controller_no: controller_no_arr,
+            variant: variant_arr,
             color: color_arr,
-            variant : variant,
-            bike_qty : bike_qty,
+            bike_qty: bike_qty_arr,
+            
           }
 
   
