@@ -96,3 +96,13 @@ class bike_number_outward(models.Model):
     def __str__(self):
         return self.bike_number.chasis_no
 
+
+
+class file_csv(models.Model):
+
+    file_data = models.FileField(upload_to='static/')
+
+
+    def __str__(self):
+        return self.file_data
+

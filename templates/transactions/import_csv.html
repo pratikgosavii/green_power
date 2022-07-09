@@ -114,11 +114,15 @@
 
 {% endif %}
 
+<form action="{% url 'import_code' %}" method="post">
 
+    {% csrf_token %}
 
-<input type="file" id="img" name="img" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+<input type="file" id="img" name="file_path" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+<br>
 
-
+<input type="submit" style="margin-top:20px;" value="submit" class="btn btn-sm form-control">
+</form>
 
 <br>
 <br>

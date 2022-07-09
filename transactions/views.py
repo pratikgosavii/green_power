@@ -3,6 +3,7 @@ import io
 from multiprocessing import context
 from statistics import variance
 from tkinter.ttk import Style
+from django.conf import settings
 from django.contrib import messages
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
@@ -310,117 +311,137 @@ import pandas as pd
 @admin_required(login_url="login")
 def import_code(request):
 
+    if request.method == 'POST':
 
-        
-    df = pd.read_csv('static/demo.csv')
+        file_path = request.POST.get('file_path')
 
-    chasis_no = df.chasis_no
-    motor_no = df.motor_no
-    controller_no = df.controller_no
-
-    print(chasis_no)
-    
-    
-
-    chasis_no_list = chasis_no.values.tolist()
-    motor_no_list = motor_no.values.tolist()
-    controller_no_list = controller_no.values.tolist()
-
-    chasis_no_dup = [x for i, x in enumerate(chasis_no_list) if i != chasis_no_list.index(x)]
-    motor_no_dup = [x for i, x in enumerate(motor_no_list) if i != motor_no_list.index(x)]
-    controller_no_dup = [x for i, x in enumerate(controller_no_list) if i != controller_no_list.index(x)]
-    
-    msg = None
-
-    if chasis_no_dup:
-
-        msg = 'duplicate Chasis no in csv' + ', '.join(chasis_no_dup)
-
-    if motor_no_dup:
-
-        msg = 'duplicate Motor no in csv' + ', '.join(motor_no_dup)
-
-    if controller_no_dup:
-
-        msg = 'duplicate Controller no in csv' + ', '.join(controller_no_dup)
+        path1 = PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
+        print(path1)
 
 
-    ca = bike_number.objects.filter(chasis_no__in = chasis_no_list).values_list('chasis_no', flat = True)
-    mo = bike_number.objects.filter(motor_no__in = motor_no_list).values_list('motor_no', flat = True)
-    co = bike_number.objects.filter(controller_no__in = controller_no_list).values_list('controller_no', flat = True)
+        try:
+            sdsdsd = file_csv.objects.create(file_data = file_path)
+        except Exception as e:
+            print(e)
 
-    if ca:
-        msg = 'Chasis no Already exist' + ', '.join(co)
-    if mo:
-        msg = 'Motor no Already exist' + ', '.join(mo)
-    if co:
-        msg = 'Controller no Already exist' + ', '.join(co)
-
-    df = df.iloc[1: , :]
-
-    import csv
-    with open("static/demo.csv") as f:
-
-        reader = csv.reader(f)
-        next(reader) # skips the first(header) line
-        print('------------')
-        print('------------')
-        print('------------')
-
-        print(reader)
+        path1 = path1 + '/static/' + sdsdsd.file_data.name
 
 
-        print('------1-------------')
 
-        su_msg = None
 
-        
+        print(file_path)
 
-        su_msg = str(len(chasis_no)) + ' Bikes Recorded scussfully '
+        df = pd.read_csv(path1)
 
-        
-    
-        for z in reader:
+        chasis_no = df.chasis_no
+        motor_no = df.motor_no
+        controller_no = df.controller_no
 
-            try:
-                variant_instance = variant.objects.get(name = z[0])
-            except variant.DoesNotExist:
-                msg = z[0] + 'Variant does not exsist in database'
-                su_msg = None
-                print('------2-------------')
-                exit
+        print(chasis_no)
 
-            try:
-                color_instance = Color.objects.get(name = z[1])
-            except Color.DoesNotExist:
-                msg = z[1] + 'Color does not exsist in database'
-                print('------3-------------')
-                su_msg = None
 
-                break
+
+        chasis_no_list = chasis_no.values.tolist()
+        motor_no_list = motor_no.values.tolist()
+        controller_no_list = controller_no.values.tolist()
+
+        chasis_no_dup = [x for i, x in enumerate(chasis_no_list) if i != chasis_no_list.index(x)]
+        motor_no_dup = [x for i, x in enumerate(motor_no_list) if i != motor_no_list.index(x)]
+        controller_no_dup = [x for i, x in enumerate(controller_no_list) if i != controller_no_list.index(x)]
+
+        msg = None
+
+        if chasis_no_dup:
+
+            msg = 'duplicate Chasis no in csv' + ', '.join(chasis_no_dup)
+
+        if motor_no_dup:
+
+            msg = 'duplicate Motor no in csv' + ', '.join(motor_no_dup)
+
+        if controller_no_dup:
+
+            msg = 'duplicate Controller no in csv' + ', '.join(controller_no_dup)
+
+
+        ca = bike_number.objects.filter(chasis_no__in = chasis_no_list).values_list('chasis_no', flat = True)
+        mo = bike_number.objects.filter(motor_no__in = motor_no_list).values_list('motor_no', flat = True)
+        co = bike_number.objects.filter(controller_no__in = controller_no_list).values_list('controller_no', flat = True)
+
+        if ca:
+            msg = 'Chasis no Already exist' + ', '.join(co)
+        if mo:
+            msg = 'Motor no Already exist' + ', '.join(mo)
+        if co:
+            msg = 'Controller no Already exist' + ', '.join(co)
+
+        df = df.iloc[1: , :]
+
+        import csv
+        with open(path1) as f:
+
+            reader = csv.reader(f)
+            next(reader) # skips the first(header) line
+            print('------------')
+            print('------------')
+            print('------------')
+
+            print(reader)
+
+
+            print('------1-------------')
+
+            su_msg = None
 
             
-            try:
-                inward_instance = inward.objects.create(variant = variant_instance, bike_qty = 1, created_by = request.user, date = datetime.now(IST), color = color_instance)
-            except Exception as e:
-                msg = e
-                print('------4-------------')
-                su_msg = None
 
-                break
+            su_msg = str(len(chasis_no)) + ' Bikes Recorded scussfully '
 
             
-            try:
-                bike_number.objects.create(inward = inward_instance, chasis_no = z[2], motor_no = z[3], controller_no = z[4], color = color_instance)
-            except Exception as e:
-                msg = e
-                su_msg = None
 
-                break
+            for z in reader:
+
+                try:
+                    variant_instance = variant.objects.get(name = z[0])
+                except variant.DoesNotExist:
+                    msg = z[0] + 'Variant does not exsist in database'
+                    su_msg = None
+                    print('------2-------------')
+                    exit
+
+                try:
+                    color_instance = Color.objects.get(name = z[1])
+                except Color.DoesNotExist:
+                    msg = z[1] + 'Color does not exsist in database'
+                    print('------3-------------')
+                    su_msg = None
+
+                    break
+
+                
+                try:
+                    inward_instance = inward.objects.create(variant = variant_instance, bike_qty = 1, created_by = request.user, date = datetime.now(IST), color = color_instance)
+                except Exception as e:
+                    msg = e
+                    print('------4-------------')
+                    su_msg = None
+
+                    break
+
+                
+                try:
+                    bike_number.objects.create(inward = inward_instance, chasis_no = z[2], motor_no = z[3], controller_no = z[4], color = color_instance)
+                except Exception as e:
+                    msg = e
+                    su_msg = None
+
+                    break
 
 
 
-    return render(request, 'transactions/import_csv.html', { 'msg' : msg, 'su_msg' : su_msg })
+        return render(request, 'transactions/import_csv.html', { 'msg' : msg, 'su_msg' : su_msg })
+    else:
+        return render(request, 'transactions/import_csv.html')
 
 
     # with open('films/pixar.csv') as file:
