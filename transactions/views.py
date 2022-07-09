@@ -378,7 +378,7 @@ def import_code(request):
 
         
 
-        su_msg = reader.count() + ' Bikes Recorded scussfully '
+        su_msg = str(len(chasis_no)) + ' Bikes Recorded scussfully '
 
         
     
