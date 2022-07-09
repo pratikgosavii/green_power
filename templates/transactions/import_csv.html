@@ -83,11 +83,13 @@
     <div class="content" id="message_div" style="display: contents">
         <!-- Animated -->
         <div class="animated fadeIn" id="message">
-
-            <div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +
-                {{ msg }}
+            {% for i in msg %}
+            <div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">
+                {{ i }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
             </div>
+
+            {% endfor %}
         
         </div>
 
@@ -118,7 +120,7 @@
 
     {% csrf_token %}
 
-<input type="file" id="img" name="file_path" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+<input type="file" id="img" style="margin-top:50px" name="file_path" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
 <br>
 
 <input type="submit" style="margin-top:20px;" value="submit" class="btn btn-sm form-control">
@@ -126,9 +128,9 @@
 
 <br>
 <br>
-<p> Your CSV must be in this format </p>
+<p style="color:black;"> Your CSV must be in this format </p>
 
-<p> Refer demo file below </p>
+<p style="color:black;"> Refer demo file below </p>
 
 <table class="styled-table ">
     <thead>

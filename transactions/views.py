@@ -1,7 +1,5 @@
 from email import message
 import io
-from multiprocessing import context
-from statistics import variance
 from tkinter.ttk import Style
 from django.conf import settings
 from django.contrib import messages
@@ -353,15 +351,15 @@ def import_code(request):
 
         if chasis_no_dup:
 
-            msg = 'duplicate Chasis no in csv' + ', '.join(chasis_no_dup)
+            msg = 'duplicate Chasis no in csv' + ' '.join(chasis_no_dup)
 
         if motor_no_dup:
 
-            msg = 'duplicate Motor no in csv' + ', '.join(motor_no_dup)
+            msg = 'duplicate Motor no in csv' + ' '.join(motor_no_dup)
 
         if controller_no_dup:
 
-            msg = 'duplicate Controller no in csv' + ', '.join(controller_no_dup)
+            msg = 'duplicate Controller no in csv' + ' '.join(controller_no_dup)
 
 
         ca = bike_number.objects.filter(chasis_no__in = chasis_no_list).values_list('chasis_no', flat = True)
@@ -393,6 +391,8 @@ def import_code(request):
 
             su_msg = None
 
+            msg = []
+
             
 
             su_msg = str(len(chasis_no)) + ' Bikes Recorded scussfully '
@@ -404,7 +404,8 @@ def import_code(request):
                 try:
                     variant_instance = variant.objects.get(name = z[0])
                 except variant.DoesNotExist:
-                    msg = z[0] + 'Variant does not exsist in database'
+                    temp =z[0] + 'Variant does not exsist in database'
+                    msg.append(temp)
                     su_msg = None
                     print('------2-------------')
                     exit
@@ -412,7 +413,8 @@ def import_code(request):
                 try:
                     color_instance = Color.objects.get(name = z[1])
                 except Color.DoesNotExist:
-                    msg = z[1] + 'Color does not exsist in database'
+                    temp = z[1] + 'Color does not exsist in database'
+                    msg.append(temp)
                     print('------3-------------')
                     su_msg = None
 
@@ -422,7 +424,7 @@ def import_code(request):
                 try:
                     inward_instance = inward.objects.create(variant = variant_instance, bike_qty = 1, created_by = request.user, date = datetime.now(IST), color = color_instance)
                 except Exception as e:
-                    msg = e
+                    msg.append(e)
                     print('------4-------------')
                     su_msg = None
 
@@ -431,12 +433,20 @@ def import_code(request):
                 
                 try:
                     bike_number.objects.create(inward = inward_instance, chasis_no = z[2], motor_no = z[3], controller_no = z[4], color = color_instance)
+                    stock_instance = stock.objects.get(variant = variant_instance, color = color_instance)
+                    stock_instance.total_bike = stock_instance.total_bike + 1
+
                 except Exception as e:
-                    msg = e
+                    msg.append(e)
+                    temp = 'Code exit at ' + str(variant_instance.name) + ' ' + str(color_instance.name) + ' ' + str(z[2]) + ' please delete data till here and try again'
+                    msg.append(temp)
                     su_msg = None
+                    inward_instance.delete()
 
                     break
 
+
+        print(msg)
 
 
         return render(request, 'transactions/import_csv.html', { 'msg' : msg, 'su_msg' : su_msg })
