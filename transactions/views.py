@@ -438,7 +438,7 @@ def import_code(request):
 
                 except Exception as e:
                     msg.append(e)
-                    temp = 'Code exit at ' + str(variant_instance.name) + ' ' + str(color_instance.name) + ' ' + str(z[2]) + ' please delete data till here and try again'
+                    temp = 'Code exit at ' + str(variant_instance.name) + ' ' + str(color_instance.name) + ' ' + str(z[2]) + ' please delete data above from this row and try again'
                     msg.append(temp)
                     su_msg = None
                     inward_instance.delete()
