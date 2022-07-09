@@ -3,6 +3,7 @@ import io
 from multiprocessing import context
 from statistics import variance
 from tkinter.ttk import Style
+from cv2 import edgePreservingFilter
 from django.contrib import messages
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
@@ -312,13 +313,116 @@ import pandas as pd
 def import_code(request):
 
 
+        
+    df = pd.read_csv('static/demo.csv')
+
+    chasis_no = df.chasis_no
+    motor_no = df.motor_no
+    controller_no = df.controller_no
+
+    print(chasis_no)
+    
+    
+
+    chasis_no_list = chasis_no.values.tolist()
+    motor_no_list = motor_no.values.tolist()
+    controller_no_list = controller_no.values.tolist()
+
+    chasis_no_dup = [x for i, x in enumerate(chasis_no_list) if i != chasis_no_list.index(x)]
+    motor_no_dup = [x for i, x in enumerate(motor_no_list) if i != motor_no_list.index(x)]
+    controller_no_dup = [x for i, x in enumerate(controller_no_list) if i != controller_no_list.index(x)]
+    
+    msg = None
+
+    if chasis_no_dup:
+
+        msg = 'duplicate Chasis no in csv' + ', '.join(chasis_no_dup)
+
+    if motor_no_dup:
+
+        msg = 'duplicate Motor no in csv' + ', '.join(motor_no_dup)
+
+    if controller_no_dup:
+
+        msg = 'duplicate Controller no in csv' + ', '.join(controller_no_dup)
+
+
+    ca = bike_number.objects.filter(chasis_no__in = chasis_no_list).values_list('chasis_no', flat = True)
+    mo = bike_number.objects.filter(motor_no__in = motor_no_list).values_list('motor_no', flat = True)
+    co = bike_number.objects.filter(controller_no__in = controller_no_list).values_list('controller_no', flat = True)
+
+    if ca:
+        msg = 'Chasis no Already exist' + ', '.join(co)
+    if mo:
+        msg = 'Motor no Already exist' + ', '.join(mo)
+    if co:
+        msg = 'Controller no Already exist' + ', '.join(co)
+
+    df = df.iloc[1: , :]
+
+    import csv
+    with open("static/demo.csv") as f:
+
+        reader = csv.reader(f)
+        next(reader) # skips the first(header) line
+        print('------------')
+        print('------------')
+        print('------------')
+
+        print(reader)
+
+
+        print('------1-------------')
+
+        su_msg = None
 
         
-    df = pd.read_csv('static/countries.csv')
 
-    print(df.area)
-    # do some other stuff
+        su_msg = reader.count() + ' Bikes Recorded scussfully '
 
+        
+    
+        for z in reader:
+
+            try:
+                variant_instance = variant.objects.get(name = z[0])
+            except variant.DoesNotExist:
+                msg = z[0] + 'Variant does not exsist in database'
+                su_msg = None
+                print('------2-------------')
+                exit
+
+            try:
+                color_instance = Color.objects.get(name = z[1])
+            except Color.DoesNotExist:
+                msg = z[1] + 'Color does not exsist in database'
+                print('------3-------------')
+                su_msg = None
+
+                break
+
+            
+            try:
+                inward_instance = inward.objects.create(variant = variant_instance, bike_qty = 1, created_by = request.user, date = datetime.now(IST), color = color_instance)
+            except Exception as e:
+                msg = e
+                print('------4-------------')
+                su_msg = None
+
+                break
+
+            
+            try:
+                bike_number.objects.create(inward = inward_instance, chasis_no = z[2], motor_no = z[3], controller_no = z[4], color = color_instance)
+            except Exception as e:
+                msg = e
+                su_msg = None
+
+                break
+
+
+
+    return render(request, 'transactions/import_csv.html', { 'msg' : msg, 'su_msg' : su_msg })
 
 
     # with open('films/pixar.csv') as file:

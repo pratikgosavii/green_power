@@ -1,0 +1,169 @@
+
+{% extends 'base/base.html' %}
+
+
+
+{% block title %}Add Company{% endblock title %}
+
+{% block breadcrumbs %}
+<div >
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+             {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">Create</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+
+{% block head %}
+
+<style>
+
+.styled-table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+}
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
+}
+
+
+
+</style>
+
+{% endblock head %}
+
+{% block content %}
+
+
+{% if msg %}
+
+    <div class="content" id="message_div" style="display: contents">
+        <!-- Animated -->
+        <div class="animated fadeIn" id="message">
+
+            <div class="alert alert-danger alert-dismissible fade show" id="message" role="alert">` +
+                {{ msg }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+            </div>
+        
+        </div>
+
+        
+    </div>
+
+{% endif %}
+
+{% if su_msg %}
+
+    <div class="content" id="message_div" style="display: contents">
+        <!-- Animated -->
+        <div class="animated fadeIn" id="message">
+
+            <div class="alert alert-success alert-dismissible fade show" id="message" role="alert">` +
+                {{ msg }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>`;
+            </div>
+        
+        </div>
+
+        
+    </div>
+
+{% endif %}
+
+
+
+<input type="file" id="img" name="img" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+
+
+
+<br>
+<br>
+<p> Your CSV must be in this format </p>
+
+<p> Refer demo file below </p>
+
+<table class="styled-table ">
+    <thead>
+    <tr>
+        <th>Varaint</th>
+        <th>Color</th>
+        <th>Chasis No</th>
+        <th>Motor No</th>
+        <th>Controller No</th>
+    </tr>
+</thead>
+    <tr>
+        <td>Earth</td>
+        <td>Black</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+       
+    </tr>
+    <tr>
+        <td>Earth</td>
+        <td>White</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+    </tr>
+    <tr>
+        <td>Star</td>
+        <td>Black</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+    </tr>
+        <td>Star</td>
+        <td>White</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+        <td>EHSJKB5667</td>
+    </tr>
+</table>
+
+{% endblock content %}
