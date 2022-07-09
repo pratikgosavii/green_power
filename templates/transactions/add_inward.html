@@ -35,6 +35,12 @@
                 <strong class="card-title">Add Inward</strong>
             </div>
             <div class="card-body">
+                <div style="justify-content: center;display: flex;align-items: center;float:right;" id="single">
+                    <button href="{% url 'import_code' %}" id="payment-button" style="background-color: #007bff; border-color: #007bff; padding: 10px;border-radius: 12px;color: white;" type="button" class="btn ">
+                         <span id="payment-button-amount">Upload CSV</span>
+                     </button>
+                   
+                </div><br>
                 <!-- Credit Card -->
                 <div id="pay-invoice">
                     <div class="card-body">
@@ -46,6 +52,8 @@
                                 
                             </div>
                         </div>
+
+                        
 
                         <form id ="inward_form">
                             {% csrf_token %}
@@ -61,6 +69,8 @@
                                  </button>
                                
                             </div><br>
+
+                           
 
                             <div style="justify-content: center;display: none;align-items: center;" id="single">
                                  <button onclick="single_dynamic_textbox()" id="payment-button" style="background-color: #007bff; border-color: #007bff; padding: 10px;border-radius: 12px;color: white;" type="button" class="btn ">
