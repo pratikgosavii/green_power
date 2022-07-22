@@ -55,6 +55,13 @@ class outward(models.Model):
     bill_number = models.CharField(max_length=50)
 
 
+class other_inward(models.Model):
+
+    name = models.CharField(max_length=100)
+    price = models.IntegerField()
+    GST_rate = models.IntegerField()
+    date = models.DateTimeField(auto_now_add=True)
+
 
 class stock(models.Model):
 

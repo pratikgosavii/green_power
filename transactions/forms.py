@@ -57,3 +57,31 @@ class outward_Form(forms.ModelForm):
             
         }
 
+
+
+
+class other_inward_Form(forms.ModelForm):
+
+    class Meta:
+        model = other_inward
+        fields = '__all__'
+        exclude = ['date']
+        widgets = {
+            
+           'name': forms.TextInput(attrs={
+                'class': 'form-control', 'id': 'distributor'
+            }),
+
+           'price': forms.NumberInput(attrs={
+                'class': 'form-control', 'id': 'bike_qty'
+            }),
+           'GST_rate': forms.NumberInput(attrs={
+                'class': 'form-control', 'id': 'showroom'
+            }),
+            
+
+            
+        }
+
+      
+

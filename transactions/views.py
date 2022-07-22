@@ -7,6 +7,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse, HttpResponse, JsonResponse
+from flask import request_started
 from distributor.models import distributor_inward
 from showroom.models import *
 from distributor.models import *
@@ -298,6 +299,47 @@ def list_inward(request):
 
     return render(request, 'transactions/list_inward.html', context)
 
+
+
+@admin_required(login_url="login")
+def add_other_inward(request):
+
+    if request.method == "POST":
+
+        forms = other_inward_Form(request.POST)
+
+        if forms.is_valid():
+
+            forms.save()
+
+            return redirect('list_other_inward')
+        else:
+            print(forms.errors)
+
+
+    else:
+
+
+        forms = other_inward_Form()
+        print(forms)
+
+        # inward_filter_data = inward_filter()
+
+        context = {
+            'form': forms,
+            # 'filter_inward' : inward_filter_data
+        }
+
+        return render(request, 'transactions/add_other_inward.html', context)
+
+
+
+@admin_required(login_url="login")
+def list_other_inward(request):
+
+    data = other_inward.objects.all()
+
+    return render(request, 'transactions/list_other_inward.html', {'data' : data})
 
 
 

@@ -1,0 +1,116 @@
+{% extends 'base/base.html' %}
+
+
+
+{% block title %}Add Dealer{% endblock title %}
+
+{% block breadcrumbs %}
+<div >
+    <div class="breadcrumbs-inner">
+        <div class="row m-0">
+           
+             {% comment %} <div class="col-sm-8">
+                <div class="page-header float-right">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Product</a></li>
+                            <li class="active">Create</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">Add Dealer</strong>
+            </div>
+            <div class="card-body">
+                <!-- Credit Card -->
+                <div id="pay-invoice">
+                    <div class="card-body">
+                        <form action="#" method="post">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Name</label>
+                                {{ form.name }}
+                                <small class="text-danger"> {{ form.name.errors.as_text }} </small>
+
+                                
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">Price</label>
+                                {{ form.price }}
+                                <small class="text-danger"> {{ form.price.errors.as_text }} </small>
+
+                            </div>
+                           
+                            <div class="form-group">
+                                <label for="name" class="control-label mb-1">GST Rate</label>
+                                {{ form.GST_rate }}
+                                <small class="text-danger"> {{ form.GST_rate.errors.as_text }} </small>
+                            </div>
+
+                            <button
+                            id="payment-button"
+                            type="submit"
+                            class="btn btn-lg btn-info btn-block"
+                          >
+                            <span id="payment-button-amount">Create Product</span>
+                          </button>
+                        </div>
+
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- .card -->
+
+    </div><!--/.col-->
+</div>
+
+
+{% endblock content %}
+       
+{% block js %}
+
+<script>
+
+    document.getElementById("submit_it").disabled = true;
+
+    function checkPasswordMatch() {
+        var password = $("#password1").val();
+        var confirmPassword = $("#password2").val();
+
+
+        var password = $("#password1").val();
+        var confirmPassword = $("#password2").val();
+    
+        if (password != confirmPassword)
+            document.getElementById("submit_it").disabled = true;
+
+        else
+            document.getElementById("submit_it").disabled = false;
+            
+    }
+
+    $(document).ready(function () {
+        $("#password2").keyup(checkPasswordMatch);
+
+       
+      });
+
+</script>
+
+{% endblock %}

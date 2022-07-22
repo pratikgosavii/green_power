@@ -19,6 +19,11 @@ urlpatterns = [
     path('delete-inward/<inward_id>', delete_inward, name='delete_inward'),
     path('list-inward/', list_inward, name='list_inward'),
 
+    path('add-other-inward/', add_other_inward, name='add_inward'),
+    # path('update-other-inward/<inward_id>', update_other_inward, name='update_inward'),
+    # path('delete-other-inward/<inward_id>', delete_other_inward, name='delete_inward'),
+    path('list-other-inward/', list_other_inward, name='list_other_inward'),
+
     path('import-csv', import_code, name='import_code'),
 
     path('update-bike_number', update_bike_number, name='update_bike_number'),
