@@ -7,7 +7,6 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse, HttpResponse, JsonResponse
-from flask import request_started
 from distributor.models import distributor_inward
 from showroom.models import *
 from distributor.models import *
